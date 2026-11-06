@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../common/UIPrimitives';
 import { useApp } from '../../contexts/AppContext';
+import { useLockBodyScroll } from '../../hooks/useLockBodyScroll';
 
 interface ModalProps {
   open: boolean;
@@ -52,6 +53,8 @@ export const Modal: React.FC<ModalProps> = ({
   hideHeader = false,
   customHeader,
 }) => {
+  useLockBodyScroll(open);
+
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -112,7 +115,7 @@ export const Modal: React.FC<ModalProps> = ({
         )}
         <div className={`overflow-y-auto flex-1 ${bodyClassName}`}>{children}</div>
         {footer && (
-          <div className="px-5 py-4 bg-[var(--color-muted)] border-t border-[var(--color-border)] flex items-center justify-between gap-3">
+          <div className="px-5 py-4 bg-[var(--color-muted)] border-t border-[var(--color-border)] flex items-center justify-between gap-3 max-sm:pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
             {footer}
           </div>
         )}

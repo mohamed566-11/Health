@@ -38,6 +38,7 @@ import { DemoTopBanner, ToastViewport } from '../components/modals/Overlays';
 import { PatientExplainerVideoModal } from '../components/patient/PatientExplainerVideo';
 import { formatNumber, formatRelativeTimeArabic } from '../utils/formatters';
 import { getDefaultHomeRouteForRole } from '../services/permissions';
+import { useLockBodyScroll } from '../hooks/useLockBodyScroll';
 
 const DemoAccountSwitcherMenu: React.FC<{
   onSelected?: () => void;
@@ -197,7 +198,7 @@ export const PatientLayout: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-[var(--color-background)] pb-[76px] md:pb-0">
+    <div className="min-h-[100dvh] flex flex-col bg-[var(--color-background)] max-md:pb-[calc(76px+env(safe-area-inset-bottom,0px))] md:pb-0">
       <a href="#main-content" className="skip-link">
         تخطي إلى المحتوى الرئيسي
       </a>
@@ -411,8 +412,8 @@ export const PatientLayout: React.FC = () => {
       {/* Mobile Fixed Bottom Navigation (5 items) */}
       <nav
         aria-label="التنقل السفلي للمريض"
-        className="md:hidden fixed bottom-0 inset-x-0 h-[64px] bg-[var(--color-white)] border-t border-[var(--color-border)] z-[var(--z-sticky)] grid grid-cols-5 no-print"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        className="md:hidden fixed bottom-0 inset-x-0 min-h-[64px] bg-[var(--color-white)] border-t border-[var(--color-border)] z-[var(--z-sticky)] grid grid-cols-5 no-print"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         {mobileBottomLinks.map((item) => (
           <NavLink
@@ -468,9 +469,24 @@ const StaffWorkspaceShell: React.FC<{
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [demoSwitcherOpen, setDemoSwitcherOpen] = useState(false);
 
+  // Lock body scroll only when mobile drawer is open below 1024px
+  useLockBodyScroll(mobileDrawerOpen);
+
   useEffect(() => {
     setMobileDrawerOpen(false);
   }, [location.pathname]);
+
+  // Close drawer on Escape
+  useEffect(() => {
+    if (!mobileDrawerOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileDrawerOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileDrawerOpen]);
 
   const SidebarContent = (isMobile = false) => (
     <div className="flex flex-col h-full bg-[var(--color-dark-teal)] text-[var(--color-white)] select-none">
@@ -601,14 +617,18 @@ const StaffWorkspaceShell: React.FC<{
           <div className="sticky top-0 h-[100dvh]">{SidebarContent(false)}</div>
         </aside>
 
-        {/* Mobile Drawer */}
+        {/* Mobile Drawer (Accessible off-canvas dialog < 1024px) */}
         {mobileDrawerOpen && (
           <div
-            className="lg:hidden fixed inset-0 z-[var(--z-drawer)] bg-[var(--color-primary-text)]/50 flex"
+            id="staff-mobile-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`قائمة التنقل لـ ${roleTitle}`}
+            className="lg:hidden fixed inset-0 z-[var(--z-drawer)] bg-[var(--color-primary-text)]/50 flex animate-fadeIn"
             onClick={() => setMobileDrawerOpen(false)}
           >
             <div
-              className="w-[280px] max-w-[85vw] h-full"
+              className="w-[280px] max-w-[85vw] h-full shadow-2xl safe-area-top safe-area-bottom"
               onClick={(e) => e.stopPropagation()}
             >
               {SidebarContent(true)}
@@ -625,6 +645,8 @@ const StaffWorkspaceShell: React.FC<{
                 type="button"
                 onClick={() => setMobileDrawerOpen(true)}
                 aria-label="فتح القائمة الجانبية"
+                aria-expanded={mobileDrawerOpen}
+                aria-controls="staff-mobile-drawer"
                 className="lg:hidden w-10 h-10 rounded-[var(--radius-sm)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-primary-text)] hover:bg-[var(--color-light-teal)] cursor-pointer"
               >
                 <Menu className="w-5 h-5" />

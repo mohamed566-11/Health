@@ -395,6 +395,28 @@ export const WelcomeLoginPage: React.FC = () => {
                 </div>
               </div>
 
+              {/* Mobile-only Explainer Video Banner (< 1024px only, zero desktop diff) */}
+              <div className="lg:hidden mb-4 p-3 rounded-[var(--radius-md)] bg-[var(--color-dark-teal)] text-[var(--color-white)] flex items-center justify-between gap-3 shadow-sm">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-[var(--color-neon-orange)] text-[var(--color-white)] flex items-center justify-center shrink-0">
+                    <PlayCircle className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[13px] font-bold truncate">شاهد الفيديو التوضيحي للمريض</div>
+                    <div className="text-[11px] text-[var(--color-white)]/80 truncate">شرح صوتي مصري تفاعلي (دقيقة واحدة)</div>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="sm"
+                  onClick={() => setVideoModalOpen(true)}
+                  className="shrink-0 text-[13px] px-3 py-1.5 min-h-[38px]"
+                >
+                  تشغيل
+                </Button>
+              </div>
+
               {authError && (
                 <div className="mb-4">
                   <InlineAlert variant="error" title="يرجى مراجعة البيانات المدخلة">
@@ -497,6 +519,7 @@ export const WelcomeLoginPage: React.FC = () => {
                               key={index}
                               type="text"
                               inputMode="numeric"
+                              autoComplete="one-time-code"
                               maxLength={1}
                               aria-label={`الرقم ${index + 1} من رمز التحقق`}
                               value={digit}
@@ -506,7 +529,7 @@ export const WelcomeLoginPage: React.FC = () => {
                                 next[index] = val;
                                 setOtpDigits(next);
                               }}
-                              className="w-12 h-12 sm:w-14 sm:h-14 text-center text-[20px] sm:text-[22px] font-bold tabular-nums rounded-[var(--radius-md)] border-2 border-[var(--color-dark-teal)] bg-[var(--color-white)] text-[var(--color-primary-text)]"
+                              className="w-12 h-12 sm:w-14 sm:h-14 text-center text-[20px] sm:text-[22px] font-bold tabular-nums rounded-[var(--radius-md)] border-2 border-[var(--color-dark-teal)] bg-[var(--color-white)] text-[var(--color-primary-text)] min-h-[48px]"
                             />
                           ))}
                         </div>
@@ -616,6 +639,7 @@ export const WelcomeLoginPage: React.FC = () => {
                               key={index}
                               type="text"
                               inputMode="numeric"
+                              autoComplete="one-time-code"
                               maxLength={1}
                               aria-label={`الرقم ${index + 1} من كود الطبيب`}
                               value={digit}
@@ -625,7 +649,7 @@ export const WelcomeLoginPage: React.FC = () => {
                                 next[index] = val;
                                 setDoctorOtpDigits(next);
                               }}
-                              className="w-12 h-12 sm:w-14 sm:h-14 text-center text-[20px] sm:text-[22px] font-bold tabular-nums rounded-[var(--radius-md)] border-2 border-[var(--color-dark-teal)] bg-[var(--color-white)] text-[var(--color-primary-text)]"
+                              className="w-12 h-12 sm:w-14 sm:h-14 text-center text-[20px] sm:text-[22px] font-bold tabular-nums rounded-[var(--radius-md)] border-2 border-[var(--color-dark-teal)] bg-[var(--color-white)] text-[var(--color-primary-text)] min-h-[48px]"
                             />
                           ))}
                         </div>
@@ -1552,7 +1576,7 @@ export const OnboardingPage: React.FC = () => {
         </div>
 
         {/* Step Dots */}
-        <div className="flex items-center justify-center gap-1.5 my-6" aria-hidden="true">
+        <div className="flex max-sm:flex-wrap items-center justify-center gap-1.5 my-6" aria-hidden="true">
           {steps.map((_, idx) => (
             <span
               key={idx}

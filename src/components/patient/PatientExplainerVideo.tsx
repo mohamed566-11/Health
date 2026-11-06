@@ -31,6 +31,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../common/UIPrimitives';
 import { Modal } from '../modals/Overlays';
+import { useFullscreen } from '../../hooks/useFullscreen';
+import { useIsMobileOrTablet } from '../../hooks/useMediaQuery';
 
 export type NarratorVoiceId = 'salma' | 'karim';
 
@@ -283,6 +285,11 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
   const narratorVoice = controlledVoice ?? internalVoice;
   const [audioReady, setAudioReady] = useState(true);
 
+  const isMobile = useIsMobileOrTablet();
+  const playerContainerRef = useRef<HTMLDivElement | null>(null);
+  const wasPlayingBeforeVisibilityRef = useRef(false);
+  const { isFullscreen, toggleFullscreen, isFallbackFullscreen } = useFullscreen(playerContainerRef);
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fallbackTimerRef = useRef<number | null>(null);
 
@@ -410,11 +417,32 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
     };
   }, [advanceToNextScene, currentScene.durationSec, isPlaying, playbackRate]);
 
-  // Cleanup on unmount
+  // Pause audio and progression when switching tabs / locking phone on mobile
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        if (isPlaying) {
+          wasPlayingBeforeVisibilityRef.current = true;
+          setIsPlaying(false);
+        }
+      } else {
+        if (wasPlayingBeforeVisibilityRef.current) {
+          wasPlayingBeforeVisibilityRef.current = false;
+          setIsPlaying(true);
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [isPlaying]);
+
+  // Cleanup on unmount - guarantees no audio overlaps on reopen
   useEffect(() => {
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current.removeAttribute('src');
+        audioRef.current.load();
       }
     };
   }, []);
@@ -510,12 +538,12 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
                 جولة مرئية سريعة بصوت مصري طبيعي تشرح لك تسجيل الدخول وملف الأمان الطبي، حجز الموعد، متابعة طابور العيادة لايف، وطباعة الروشتة الإلكترونية.
               </p>
             </div>
-            {/* Chapter preview chips */}
-            <div className="flex flex-wrap gap-2 pt-0.5">
+            {/* Chapter preview chips - swipeable scroll on small mobile */}
+            <div className="flex max-sm:flex-nowrap max-sm:overflow-x-auto max-sm:no-scrollbar flex-wrap gap-2 pt-0.5">
               {EXPLAINER_SCENES.map((sc, idx) => (
                 <span
                   key={sc.id}
-                  className="px-2.5 py-1 rounded-[var(--radius-sm)] bg-[#031518]/85 border border-[var(--color-white)]/15 text-[11px] font-bold text-[var(--color-white)]/90 flex items-center gap-1.5 shadow-xs"
+                  className="px-2.5 py-1 rounded-[var(--radius-sm)] bg-[#031518]/85 border border-[var(--color-white)]/15 text-[11px] font-bold text-[var(--color-white)]/90 flex items-center gap-1.5 shadow-xs max-sm:shrink-0 max-sm:whitespace-nowrap"
                 >
                   <span className="w-4 h-4 rounded-full bg-[var(--color-neon-orange)] text-[var(--color-white)] text-[10px] font-bold flex items-center justify-center shrink-0">
                     {idx + 1}
@@ -543,10 +571,11 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
 
   return (
     <div
+      ref={playerContainerRef}
       className={
         hideHeaderBar
-          ? 'flex flex-col flex-1 bg-[#041E24] text-[var(--color-white)] overflow-hidden'
-          : 'rounded-[22px] bg-[#041E24] text-[var(--color-white)] border border-[var(--color-white)]/15 ring-1 ring-black/30 overflow-hidden shadow-[0_24px_60px_-20px_rgba(0,0,0,0.85)]'
+          ? `flex flex-col flex-1 bg-[#041E24] text-[var(--color-white)] overflow-hidden ${isFallbackFullscreen ? 'mobile-fullscreen-active' : ''}`
+          : `rounded-[22px] bg-[#041E24] text-[var(--color-white)] border border-[var(--color-white)]/15 ring-1 ring-black/30 overflow-hidden shadow-[0_24px_60px_-20px_rgba(0,0,0,0.85)] ${isFallbackFullscreen ? 'mobile-fullscreen-active' : ''}`
       }
     >
       {/* Hidden Real HTML5 Audio Element playing 24kHz Natural Human Egyptian Arabic WAV */}
@@ -626,7 +655,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
       <div
         role="tablist"
         aria-label="فصول الفيديو التوضيحي الخمسة"
-        className="grid grid-cols-2 sm:grid-cols-5 border-b border-[var(--color-white)]/15 bg-[#08343C]"
+        className="max-sm:flex max-sm:flex-nowrap max-sm:overflow-x-auto max-sm:no-scrollbar grid grid-cols-2 sm:grid-cols-5 border-b border-[var(--color-white)]/15 bg-[#08343C]"
       >
         {EXPLAINER_SCENES.map((scene, idx) => {
           const isActive = sceneIndex === idx;
@@ -638,7 +667,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
               role="tab"
               aria-selected={isActive}
               onClick={() => handleSelectScene(idx)}
-              className={`relative px-3.5 py-3 text-start transition-colors cursor-pointer flex flex-col justify-between gap-1 border-e border-[var(--color-white)]/10 last:border-e-0 ${
+              className={`relative px-3.5 py-3 max-sm:min-w-[145px] max-sm:shrink-0 text-start transition-colors cursor-pointer flex flex-col justify-between gap-1 border-e border-[var(--color-white)]/10 last:border-e-0 ${
                 isActive
                   ? 'bg-[#0D4D58] text-[var(--color-white)]'
                   : isCompleted
@@ -751,7 +780,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
         {/* Split Grid: 4 Columns Step-by-Step Breakdown | 8 Columns High-Contrast App Screen */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           {/* Right Column (4 cols in RTL): 3 Synchronized Micro-Steps + Takeaway */}
-          <div className="lg:col-span-5 flex flex-col justify-between gap-3 bg-[#041E24]/90 rounded-[var(--radius-md)] p-4 border border-[var(--color-white)]/15">
+          <div className="lg:col-span-5 max-lg:order-2 flex flex-col justify-between gap-3 bg-[#041E24]/90 rounded-[var(--radius-md)] p-4 border border-[var(--color-white)]/15">
             <div className="space-y-2.5">
               <div className="flex items-center justify-between text-[12px] font-bold text-[var(--color-white)]/80 pb-1 border-b border-[var(--color-white)]/10">
                 <span>الخطوات التوضيحية في هذه الشاشة:</span>
@@ -813,7 +842,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
           </div>
 
           {/* Left Column (7 cols in RTL): Ultra-Clear Simulated App Browser Frame */}
-          <div className="lg:col-span-7 flex flex-col rounded-[var(--radius-md)] bg-[var(--color-white)] text-[var(--color-primary-text)] border-2 border-[var(--color-white)]/30 shadow-[var(--shadow-lg)] overflow-hidden">
+          <div className="lg:col-span-7 max-lg:order-1 flex flex-col rounded-[var(--radius-md)] bg-[var(--color-white)] text-[var(--color-primary-text)] border-2 border-[var(--color-white)]/30 shadow-[var(--shadow-lg)] overflow-hidden">
             {/* Simulated Browser Top Bar */}
             <div className="px-3.5 py-2 bg-[#EEF5F6] border-b border-[var(--color-border)] flex items-center justify-between gap-2">
               <div className="flex items-center gap-1.5">
@@ -1307,7 +1336,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
                 النص الصوتي المسموع الآن ({activeVoiceProfile.nameAr} — لهجة مصرية طبيعية ١٠٠٪):
               </span>
             </div>
-            <p className="text-[14px] sm:text-[16px] leading-relaxed font-semibold">
+            <p className="text-[14px] sm:text-[16px] leading-[1.8] font-semibold max-lg:max-h-[85px] max-lg:overflow-y-auto no-scrollbar">
               {narrationWords.map((word, wIdx) => {
                 const isSpoken = wIdx < highlightedWordCount;
                 const isCurrentWord =
@@ -1373,7 +1402,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
       </div>
 
       {/* 5. Bottom Studio Controls Bar (Timeline Scrubber + Play/Pause + Voice Switcher + Speed) */}
-      <div className="px-4 sm:px-6 py-3 bg-[#041E24] border-t border-[var(--color-white)]/15 space-y-2.5">
+      <div className="px-4 sm:px-6 py-3 max-lg:pb-[max(14px,env(safe-area-inset-bottom))] bg-[#041E24] border-t border-[var(--color-white)]/15 space-y-2.5">
         {/* Global Timeline Scrubber */}
         <div className="flex items-center gap-3">
           <span className="text-[12px] font-bold tabular-nums text-[var(--color-neon-orange)]">
@@ -1387,7 +1416,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
             step={0.2}
             value={currentTime}
             onChange={(e) => handleScrubTimeline(Number(e.target.value))}
-            className="flex-1 h-2 accent-[var(--color-neon-orange)] cursor-pointer"
+            className="flex-1 h-2 max-lg:h-4 accent-[var(--color-neon-orange)] cursor-pointer touch-none"
           />
           <span className="text-[12px] tabular-nums text-[var(--color-white)]/75">
             {formatTimecode(TOTAL_DURATION_SEC)}
@@ -1400,7 +1429,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
             <button
               type="button"
               onClick={handleTogglePlay}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-[var(--radius-sm)] bg-[var(--color-neon-orange)] hover:bg-[var(--color-neon-orange-hover)] text-[var(--color-white)] text-[13px] font-bold cursor-pointer transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 min-h-[44px] rounded-[var(--radius-sm)] bg-[var(--color-neon-orange)] hover:bg-[var(--color-neon-orange-hover)] text-[var(--color-white)] text-[13px] font-bold cursor-pointer transition-colors"
             >
               {isPlaying ? (
                 <>
@@ -1425,7 +1454,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
               type="button"
               onClick={() => handleSelectScene(0)}
               aria-label="إعادة الفيديو من الفصل الأول"
-              className="px-3 py-1.5 rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 text-[12px] font-semibold text-[var(--color-white)] cursor-pointer"
+              className="px-3 py-1.5 min-h-[44px] rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 text-[12px] font-semibold text-[var(--color-white)] cursor-pointer"
             >
               من البداية
             </button>
@@ -1435,7 +1464,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
             <button
               type="button"
               onClick={() => setIsMuted((m) => !m)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 text-[12px] font-semibold text-[var(--color-white)] cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 text-[12px] font-semibold text-[var(--color-white)] cursor-pointer"
             >
               {isMuted ? (
                 <>
@@ -1453,9 +1482,19 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
             <button
               type="button"
               onClick={() => setPlaybackRate((r) => (r === 1 ? 1.25 : 1))}
-              className="px-2.5 py-1.5 rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 text-[12px] font-bold tabular-nums text-[var(--color-white)] cursor-pointer"
+              className="px-2.5 py-1.5 min-h-[44px] rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 text-[12px] font-bold tabular-nums text-[var(--color-white)] cursor-pointer"
             >
               السرعة: {playbackRate}x
+            </button>
+
+            {/* Mobile-only Theatre / Fullscreen Toggle Button (< 1024px) */}
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              aria-label={isFullscreen ? 'الخروج من ملء الشاشة' : 'تكبير الشاشة (وضع المسرح)'}
+              className="lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-neon-orange)] text-[var(--color-white)] cursor-pointer transition-colors"
+            >
+              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -1475,11 +1514,11 @@ export const PatientExplainerVideoModal: React.FC<{
       open={open}
       onClose={onClose}
       maxWidthClass="w-[99vw] max-w-[99vw]"
-      overlayClassName="items-center justify-center bg-[#010C0F]/90 backdrop-blur-md p-1 sm:p-2"
-      panelClassName="bg-[#031A20] rounded-[16px] sm:rounded-[20px] border border-cyan-400/35 ring-2 ring-[var(--color-neon-orange)]/35 shadow-[0_35px_120px_rgba(0,0,0,0.95)] h-[98dvh] max-h-[98dvh] flex flex-col overflow-hidden text-[var(--color-white)]"
+      overlayClassName="items-center justify-center bg-[#010C0F]/90 backdrop-blur-md p-1 sm:p-2 max-lg:p-0"
+      panelClassName="bg-[#031A20] rounded-[16px] sm:rounded-[20px] max-lg:rounded-none max-lg:border-0 max-lg:h-[100dvh] max-lg:max-h-[100dvh] max-lg:w-full border border-cyan-400/35 ring-2 ring-[var(--color-neon-orange)]/35 shadow-[0_35px_120px_rgba(0,0,0,0.95)] h-[98dvh] max-h-[98dvh] flex flex-col overflow-hidden text-[var(--color-white)]"
       bodyClassName="p-0 flex flex-col flex-1 overflow-y-auto bg-[#031A20]"
       customHeader={
-        <div className="px-4 sm:px-6 py-3.5 bg-gradient-to-l from-[#041E24] via-[#072E35] to-[#0A434D] border-b border-[var(--color-white)]/15 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div className="px-4 sm:px-6 py-3.5 max-lg:pt-[max(12px,env(safe-area-inset-top))] max-lg:px-3 bg-gradient-to-l from-[#041E24] via-[#072E35] to-[#0A434D] border-b border-[var(--color-white)]/15 flex flex-wrap items-center justify-between gap-3 shrink-0">
           {/* Right Section: Live Badge + Title + Dialect */}
           <div className="flex items-center gap-3 min-w-0">
             <span className="w-10 h-10 rounded-xl bg-[var(--color-neon-orange)] text-[var(--color-white)] flex items-center justify-center shrink-0 shadow-md shadow-[var(--color-neon-orange)]/30">
@@ -1539,7 +1578,7 @@ export const PatientExplainerVideoModal: React.FC<{
               onClick={onClose}
               aria-label="إغلاق الفيديو"
               title="إغلاق (Esc)"
-              className="w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--color-white)]/10 hover:bg-[var(--color-neon-orange)] text-[var(--color-white)] transition-colors cursor-pointer border border-[var(--color-white)]/15 shrink-0"
+              className="w-10 h-10 max-lg:w-11 max-lg:h-11 rounded-lg flex items-center justify-center bg-[var(--color-white)]/10 hover:bg-[var(--color-neon-orange)] text-[var(--color-white)] transition-colors cursor-pointer border border-[var(--color-white)]/15 shrink-0"
             >
               <X className="w-5 h-5" />
             </button>

@@ -1183,7 +1183,7 @@ export const BookingPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-lg:pb-24">
       <Breadcrumbs
         items={[
           { label: 'الرئيسية', to: '/patient' },
@@ -1343,6 +1343,30 @@ export const BookingPage: React.FC = () => {
             </div>
           </Card>
         </aside>
+      </div>
+
+      {/* Mobile Sticky Summary & Action Bar (< 1024px only) */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-[var(--z-sticky)] bg-[var(--color-white)] border-t border-[var(--color-border)] p-3 safe-area-bottom shadow-[0_-4px_16px_rgba(0,0,0,0.08)] flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-[12px] text-[var(--color-secondary-text)] truncate">{doctor.name} · {selectedSlot}</div>
+          <div className="text-[16px] font-bold text-[var(--color-dark-teal)] tabular-nums">{formatCurrencyEGP(fee)}</div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {step > 0 && (
+            <Button variant="ghost" size="sm" onClick={() => setStep((s) => s - 1)}>
+              السابق
+            </Button>
+          )}
+          {step < 3 ? (
+            <Button variant="primary" size="md" onClick={() => setStep((s) => s + 1)}>
+              التالي
+            </Button>
+          ) : (
+            <Button variant="primary" size="md" onClick={handleConfirmBooking}>
+              تأكيد الحجز
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -234,7 +234,8 @@ export const AdminDoctorsPage: React.FC = () => {
         />
       </Card>
 
-      <Card padding="none" className="overflow-hidden">
+      {/* Desktop/Tablet Table (>= 768px, Protected) */}
+      <Card padding="none" className="hidden md:block overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-[15px] border-collapse">
             <thead>
@@ -309,6 +310,69 @@ export const AdminDoctorsPage: React.FC = () => {
           </table>
         </div>
       </Card>
+
+      {/* Mobile Screen Cards (< 768px) */}
+      <div className="md:hidden space-y-3">
+        {filtered.map((doc) => (
+          <Card key={doc.id} padding="md" className="space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <div className="font-bold text-[16px] text-[var(--color-primary-text)]">{doc.name}</div>
+                <div className="text-[13px] text-[var(--color-secondary-text)]">{doc.titleAr}</div>
+                <div className="text-[13px] font-semibold text-[var(--color-dark-teal)] mt-0.5">{doc.specialtyAr}</div>
+              </div>
+              <span
+                className={`px-2.5 py-1 rounded-[var(--radius-sm)] text-[12px] font-bold shrink-0 ${
+                  statusLabel[doc.status].classes
+                }`}
+              >
+                {statusLabel[doc.status].text}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-[var(--color-border)]/60 pt-2 text-[13px]">
+              <div>
+                <span className="text-[var(--color-secondary-text)]">سعر الكشف: </span>
+                <strong className="text-[var(--color-primary-text)] font-bold tabular-nums">
+                  {formatCurrencyEGP(doc.consultationFee)}
+                </strong>
+              </div>
+              <RatingDisplay rating={doc.rating} reviewsCount={doc.reviewsCount} />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 border-t border-[var(--color-border)]/60 pt-2.5">
+              {doc.status !== 'approved' && (
+                <Button
+                  variant="success-confirm"
+                  size="sm"
+                  className="min-h-[44px] flex-1"
+                  onClick={() => updateDoctorStatusAdmin(doc.id, 'approved')}
+                >
+                  اعتماد
+                </Button>
+              )}
+              {doc.status === 'approved' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="min-h-[44px] flex-1"
+                  onClick={() => updateDoctorStatusAdmin(doc.id, 'suspended')}
+                >
+                  إيقاف مؤقت
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="min-h-[44px] flex-1"
+                onClick={() => setEditingDoc(doc)}
+              >
+                تعديل
+              </Button>
+            </div>
+          </Card>
+        ))}
+      </div>
 
       <Modal
         open={Boolean(editingDoc)}

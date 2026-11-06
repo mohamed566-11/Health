@@ -242,6 +242,58 @@
   }
 }
 
+/* Mobile & Tablet Editable Range (< 1024px) - Scoped Additions Only. Desktop (>= 1024px) is strictly untouched. */
+@media (max-width: 1023.98px) {
+  /* Prevent iOS text auto-zoom on input focus by guaranteeing 16px font size */
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Safe Area Utility Classes */
+  .safe-area-top {
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+  .safe-area-bottom {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  .safe-area-x {
+    padding-inline-start: max(16px, env(safe-area-inset-left));
+    padding-inline-end: max(16px, env(safe-area-inset-right));
+  }
+
+  /* Horizontal scroll without visible scrollbar for chips and tabs */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Mobile Fullscreen Video Fallback for iOS */
+  .mobile-fullscreen-active {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    z-index: var(--z-modal) !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Performance: reduce heavy backdrop blur on mobile coarse pointers */
+  @media (pointer: coarse) {
+    .backdrop-blur-md,
+    .backdrop-blur-lg,
+    .backdrop-blur-xl {
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+  }
+}
+
 /* Dedicated Print Stylesheet for Prescriptions */
 @media print {
   body {

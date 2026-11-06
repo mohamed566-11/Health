@@ -456,43 +456,105 @@ export const NurseQueuePage: React.FC = () => {
 
           {/* Mobile Stacked Queue Cards (< 768px) */}
           <div className="md:hidden space-y-3">
-            {todayQueue.map((apt) => (
-              <Card key={apt.id} padding="md" className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded bg-[var(--color-light-teal)] text-[var(--color-dark-teal)] font-bold tabular-nums">
-                      {apt.bookingNumber}
-                    </span>
-                    <strong className="text-[16px]">{apt.patientName}</strong>
+            {todayQueue.map((apt) => {
+              const isActive = ['in_examination', 'arrived', 'waiting', 'booked'].includes(apt.status);
+              return (
+                <Card
+                  key={apt.id}
+                  padding="md"
+                  className={`space-y-3 ${
+                    apt.status === 'in_examination' ? 'border-2 border-[var(--color-neon-orange)] bg-[var(--color-light-teal)]/30' : ''
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-1 rounded bg-[var(--color-light-teal)] text-[var(--color-dark-teal)] font-bold tabular-nums">
+                        {apt.bookingNumber}
+                      </span>
+                      <strong className="text-[16px] text-[var(--color-primary-text)]">{apt.patientName}</strong>
+                    </div>
+                    <StatusBadge status={apt.status} size="sm" />
                   </div>
-                  <StatusBadge status={apt.status} size="sm" />
-                </div>
-                <div className="text-[13px] text-[var(--color-secondary-text)] flex justify-between">
-                  <span dir="ltr">{apt.patientPhone}</span>
-                  <span>الموعد: {apt.timeSlot}</span>
-                </div>
-                <div className="flex flex-wrap gap-2 pt-2 border-t border-[var(--color-border)]">
-                  {apt.status !== 'in_examination' && apt.status !== 'completed' && (
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => startExamination(apt.id)}
-                    >
-                      بدء الكشف
-                    </Button>
-                  )}
-                  {(apt.status === 'waiting' || apt.status === 'booked') && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => updateAppointmentStatus(apt.id, 'arrived')}
-                    >
-                      وصل العيادة
-                    </Button>
-                  )}
-                </div>
-              </Card>
-            ))}
+                  <div className="text-[13px] text-[var(--color-secondary-text)] flex justify-between">
+                    <span dir="ltr">{apt.patientPhone}</span>
+                    <span>الموعد: {apt.timeSlot}</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[var(--color-border)]">
+                    {apt.status !== 'in_examination' && apt.status !== 'completed' && apt.status !== 'cancelled' && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="min-h-[44px] px-3"
+                        onClick={() => startExamination(apt.id)}
+                      >
+                        بدء الكشف
+                      </Button>
+                    )}
+                    {(apt.status === 'waiting' || apt.status === 'booked') && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="min-h-[44px] px-3"
+                        onClick={() => updateAppointmentStatus(apt.id, 'arrived')}
+                      >
+                        وصل العيادة
+                      </Button>
+                    )}
+
+                    {isActive && apt.status !== 'in_examination' && (
+                      <div className="flex items-center gap-1.5 ms-auto">
+                        <button
+                          type="button"
+                          onClick={() => moveAppointmentInQueue(apt.id, 'up')}
+                          aria-label={`تقديم ${apt.patientName} في الدور`}
+                          title="تقديم في الدور"
+                          className="min-w-[44px] min-h-[44px] rounded border border-[var(--color-border)] flex items-center justify-center hover:bg-[var(--color-light-teal)] cursor-pointer active:scale-95 transition-transform"
+                        >
+                          <ArrowUp className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveAppointmentInQueue(apt.id, 'down')}
+                          aria-label={`تأخير ${apt.patientName} في الدور`}
+                          title="تأخير في الدور"
+                          className="min-w-[44px] min-h-[44px] rounded border border-[var(--color-border)] flex items-center justify-center hover:bg-[var(--color-light-teal)] cursor-pointer active:scale-95 transition-transform"
+                        >
+                          <ArrowDown className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setConfirmAction({
+                              appointment: apt,
+                              targetStatus: 'no_show',
+                              title: 'تسجيل عدم حضور المريض (No Show)',
+                              description: `هل تريد تسجيل المريض "${apt.patientName}" (${apt.bookingNumber}) كـ "لم يحضر" واستبعاده من الطابور النشط؟`,
+                            })
+                          }
+                          className="min-h-[44px] px-2.5 py-1.5 rounded text-[12px] font-semibold text-[var(--color-secondary-text)] hover:bg-[var(--color-muted)] cursor-pointer border border-[var(--color-border)]/60"
+                        >
+                          لم يحضر
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setConfirmAction({
+                              appointment: apt,
+                              targetStatus: 'cancelled',
+                              title: 'إلغاء حجز المريض',
+                              description: `سيتم إلغاء حجز "${apt.patientName}" (${apt.bookingNumber}). هل أنت متأكد؟`,
+                            })
+                          }
+                          className="min-h-[44px] px-2.5 py-1.5 rounded text-[12px] font-semibold text-[var(--color-red)] hover:bg-[var(--color-red-subtle)] cursor-pointer border border-[var(--color-red)]/30"
+                        >
+                          إلغاء
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              );
+            })}
           </div>
         </div>
 

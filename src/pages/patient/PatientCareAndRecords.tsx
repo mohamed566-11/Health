@@ -870,7 +870,7 @@ export const PrescriptionViewPage: React.FC = () => {
       <div className="overflow-x-auto">
       <article
         aria-label="وثيقة الروشتة الإلكترونية"
-        className="prescription-paper max-w-[794px] mx-auto bg-[var(--color-white)] rounded-[var(--radius-lg)] border-2 border-[var(--color-dark-teal)] p-6 sm:p-10 space-y-6"
+        className="prescription-paper max-w-[794px] mx-auto bg-[var(--color-white)] rounded-[var(--radius-lg)] border-2 border-[var(--color-dark-teal)] p-6 sm:p-10 max-md:p-4 max-md:space-y-4 space-y-6"
       >
         {/* Top Demo Medical Disclaimer Banner (Visible on screen AND print) */}
         <div className="p-3 rounded-[var(--radius-sm)] bg-[var(--color-red-subtle)] border border-[var(--color-red)] text-[var(--color-red)] text-center font-bold text-[14px]">
@@ -924,7 +924,8 @@ export const PrescriptionViewPage: React.FC = () => {
             <span>الأدوية الموصوفة والجرعات (℞)</span>
           </h2>
 
-          <div className="overflow-x-auto">
+          {/* Desktop/Tablet/Print Table (Protected range >= 640px + Print) */}
+          <div className="hidden sm:block print:block overflow-x-auto">
             <table className="w-full border-collapse text-[14px]">
               <thead>
                 <tr className="bg-[var(--color-dark-teal)] text-[var(--color-white)]">
@@ -972,6 +973,59 @@ export const PrescriptionViewPage: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Screen Cards (< 640px, Hidden in Print) */}
+          <div className="block sm:hidden print:hidden space-y-3">
+            {rx.medicines.map((med, idx) => (
+              <div
+                key={med.id || idx}
+                className="p-3.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] space-y-2.5 shadow-xs"
+              >
+                <div className="flex items-start justify-between gap-2 border-b border-[var(--color-border)]/60 pb-2">
+                  <div>
+                    <div className="font-bold text-[15px] text-[var(--color-primary-text)]">
+                      <bdi>{med.name}</bdi>
+                    </div>
+                    <div className="text-[13px] text-[var(--color-secondary-text)]">
+                      {med.dosageForm} · {med.strength}
+                    </div>
+                  </div>
+                  <span className="text-[12px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-teal)]/10 text-[var(--color-dark-teal)] shrink-0">
+                    ℞ {idx + 1}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-[13px]">
+                  <div>
+                    <span className="text-[var(--color-secondary-text)] block text-[11px]">الجرعة والتكرار:</span>
+                    <strong className="text-[var(--color-primary-text)] block">{med.dosage}</strong>
+                    <span className="text-[12px] text-[var(--color-secondary-text)] block">{med.frequency}</span>
+                  </div>
+                  <div>
+                    <span className="text-[var(--color-secondary-text)] block text-[11px]">الموعد والأكل:</span>
+                    <span className="text-[var(--color-primary-text)] block">{med.timeOfUse}</span>
+                    <strong className="text-[var(--color-dark-teal)] text-[12px] block">{med.foodRelation}</strong>
+                  </div>
+                  <div className="col-span-2 flex items-center justify-between border-t border-[var(--color-border)]/40 pt-2 text-[12px]">
+                    <div>
+                      <span className="text-[var(--color-secondary-text)]">المدة: </span>
+                      <strong className="text-[var(--color-primary-text)]">{med.duration}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[var(--color-secondary-text)]">الكمية: </span>
+                      <strong className="text-[var(--color-primary-text)]">{med.quantity}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {med.instructions && (
+                  <div className="text-[12px] text-[var(--color-dark-teal)] bg-[var(--color-teal)]/10 p-2 rounded-[var(--radius-sm)]">
+                    تعليمات: {med.instructions}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
