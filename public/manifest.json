@@ -1,0 +1,18 @@
+{
+  "name": "Maw3edy — موعدي",
+  "short_name": "موعدي",
+  "description": "منصة موعدي لحجز العيادات، متابعة الدور اللحظي، السجل الطبي، والروشتات الإلكترونية في مصر.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F8F8",
+  "theme_color": "#0B434C",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

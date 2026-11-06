@@ -1,0 +1,6 @@
+{
+  "name": "Maw3edy — موعدي",
+  "description": "منصة موعدي لحجز العيادات، متابعة الدور اللحظي، السجل الطبي، والروشتات الإلكترونية في مصر.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

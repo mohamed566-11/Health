@@ -1,0 +1,56 @@
+{
+  "salma": [
+    {
+      "sceneId": 0,
+      "filename": "egyptian-salma-scene-0.wav",
+      "durationSec": 18.61
+    },
+    {
+      "sceneId": 1,
+      "filename": "egyptian-salma-scene-1.wav",
+      "durationSec": 18.01
+    },
+    {
+      "sceneId": 2,
+      "filename": "egyptian-salma-scene-2.wav",
+      "durationSec": 18.25
+    },
+    {
+      "sceneId": 3,
+      "filename": "egyptian-salma-scene-3.wav",
+      "durationSec": 19.57
+    },
+    {
+      "sceneId": 4,
+      "filename": "egyptian-salma-scene-4.wav",
+      "durationSec": 18.33
+    }
+  ],
+  "karim": [
+    {
+      "sceneId": 0,
+      "filename": "egyptian-karim-scene-0.wav",
+      "durationSec": 18.13
+    },
+    {
+      "sceneId": 1,
+      "filename": "egyptian-karim-scene-1.wav",
+      "durationSec": 18.93
+    },
+    {
+      "sceneId": 2,
+      "filename": "egyptian-karim-scene-2.wav",
+      "durationSec": 16.93
+    },
+    {
+      "sceneId": 3,
+      "filename": "egyptian-karim-scene-3.wav",
+      "durationSec": 18.09
+    },
+    {
+      "sceneId": 4,
+      "filename": "egyptian-karim-scene-4.wav",
+      "durationSec": 18.33
+    }
+  ]
+}

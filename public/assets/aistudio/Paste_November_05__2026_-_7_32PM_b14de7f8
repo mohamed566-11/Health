@@ -1,0 +1,1593 @@
+# MAW3EDY — MASTER REACT WEB APPLICATION DEVELOPMENT PROMPT
+
+## 1. ROLE AND OBJECTIVE
+
+Act as a Senior React Engineer, Senior Web Product Designer, Software Architect, and Healthcare UX Specialist.
+
+Your mission is to build a complete, polished, professional, lightweight, and fully interactive healthcare WEBSITE (web application) named "Maw3edy" (موعدي).
+
+The website connects:
+
+1. Patients.
+2. Doctors.
+3. Nurses / Receptionists.
+4. Super Administrators.
+
+This is a real, responsive web application that runs in any modern browser (desktop, tablet, and mobile). It is NOT a native mobile application.
+
+Build an actual working website with real routing, reusable components, functional forms, local data persistence, and realistic simulated workflows.
+
+Do not build a marketing-only landing page. A simple public welcome/login page is part of the app, but the main deliverable is the full working multi-role application.
+
+Do not use React Native, Expo, or any native mobile framework.
+
+## 2. STRICT TECHNOLOGY REQUIREMENTS
+
+Use the following stack:
+
+- React 18+ with functional components and hooks.
+- Vite as the build tool and dev server.
+- TypeScript (strict mode).
+- React Router (react-router-dom) for client-side routing.
+- CSS Modules (or plain CSS files) with a centralized design-token file using CSS custom properties.
+- React Context and useReducer for global state management, or another lightweight solution when justified.
+- localStorage for demo data persistence (wrapped in a reusable storage service; use IndexedDB only if data size requires it).
+- lucide-react for icons.
+- A locally bundled Arabic font (Cairo or Noto Sans Arabic via @fontsource) so there is no runtime network dependency.
+
+Install dependencies with npm using standard, current compatible versions. Do not guess versions; let npm resolve them.
+
+IMPORTANT:
+
+This project must remain a genuine web project.
+
+Do NOT use:
+
+- React Native.
+- Expo or Expo Router.
+- AsyncStorage.
+- lucide-react-native.
+- StyleSheet.create.
+- Native-only components (View, Text, FlatList, Pressable, SafeAreaView, KeyboardAvoidingView).
+- I18nManager.
+- WebView-style wrappers.
+- Heavy UI frameworks that fight the brand system (Bootstrap, Material UI, Ant Design).
+
+Use semantic HTML elements:
+
+- header, nav, main, section, aside, footer.
+- button, a (via Link/NavLink), form, label, input, select, textarea.
+- ul / li for lists, table only for genuinely tabular data.
+- dialog (or an accessible modal component) for confirmations.
+
+All screens must be built with semantic, accessible HTML and React components.
+
+## 3. DEVELOPMENT PHASE AND BACKEND RESTRICTIONS
+
+Build the first version as a frontend-only prototype.
+
+Do not implement any real backend.
+
+Do not connect:
+
+- Supabase.
+- Firebase.
+- MySQL.
+- PostgreSQL.
+- External authentication providers.
+- Payment gateways.
+- Real SMS or email services.
+- External medical APIs.
+- External map APIs (no Google Maps embeds, no Leaflet tiles).
+
+Instead, implement:
+
+- Mock authentication.
+- Sample Egyptian data.
+- Local application state.
+- localStorage persistence.
+- Simulated notifications.
+- Simulated queue management.
+- Simulated medical records.
+- Simulated prescriptions.
+
+The website must work without a backend or internet connection after the first load (all fonts, icons, and assets bundled locally).
+
+Every interaction must work locally.
+
+Changes must persist after refreshing the page and after closing and reopening the browser.
+
+Clearly identify demo-only data and simulated operations.
+
+Never present fake prescriptions as valid medical prescriptions.
+
+## 4. BRAND IDENTITY — STRICT COLOR SYSTEM
+
+The website's primary visual identity must be built around these three exact colors:
+
+### Primary colors
+
+Dark Teal: #0B434C
+Pure White: #FFFFFF
+Neon Orange: #FF5533
+
+These colors are mandatory. Use them consistently across the entire website.
+
+### Semantic secondary colors
+
+Red: #D94848
+Green: #23845C
+
+Red and green must only communicate meaningful statuses.
+
+RED usage:
+- Errors.
+- Failed actions.
+- Cancellation.
+- Critical warnings.
+- Rejected operations.
+
+GREEN usage:
+- Successful bookings.
+- Confirmations.
+- Completed examinations.
+- Successful operations.
+- Completed tasks.
+
+Never use red and green as decorative brand colors.
+
+### Supporting neutral colors
+
+Background: #F5F8F8
+Card Background: #FFFFFF
+Light Teal Surface: #EDF5F5
+Primary Text: #16363A
+Secondary Text: #708486
+Border: #E3EBEA
+Muted Surface: #F2F6F5
+
+### Color usage rules
+
+- Dark teal is the main brand and navigation color.
+- White must dominate the interface.
+- Neon orange highlights important actions and key visual elements.
+- Green indicates successful states.
+- Red indicates errors and critical states.
+- Neutral colors keep the interface calm.
+
+Do not introduce additional bright colors.
+Do not use excessive gradients.
+Use color consistently across all four user roles.
+
+### Theme Architecture (Web)
+
+Create a centralized token file: src/theme/tokens.css
+
+:root {
+  --color-dark-teal: #0B434C;
+  --color-white: #FFFFFF;
+  --color-neon-orange: #FF5533;
+  --color-red: #D94848;
+  --color-green: #23845C;
+  --color-background: #F5F8F8;
+  --color-light-teal: #EDF5F5;
+  --color-primary-text: #16363A;
+  --color-secondary-text: #708486;
+  --color-border: #E3EBEA;
+  --color-muted: #F2F6F5;
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --font-arabic: 'Cairo', system-ui, sans-serif;
+}
+
+Also export a typed src/theme/colors.ts mirror of the same values for any JS usage.
+
+No component may hardcode a color; all components must use the tokens.
+
+## 5. DESIGN AND USER EXPERIENCE
+
+Design the website like a premium healthcare web product.
+
+The result must feel:
+
+- Professional.
+- Modern.
+- Trustworthy.
+- Clean.
+- Calm.
+- Extremely easy to use.
+- Fast.
+- Lightweight.
+
+Design principles:
+
+- Minimal interface.
+- White backgrounds.
+- Dark teal navigation and headers.
+- Orange highlights.
+- Clear typography.
+- Consistent iconography.
+- Smooth and subtle transitions (CSS transitions only).
+- Rounded cards.
+- Clean forms.
+- Simple buttons with clear hover, focus, and active states.
+- Clear information hierarchy.
+- Consistent spacing scale.
+
+Use moderate corner radiuses between 10 and 16 pixels.
+
+Avoid excessive shadows.
+Avoid excessive animations.
+Avoid large decorative illustrations.
+Avoid overcrowded layouts.
+
+Use short and clear Arabic wording.
+
+The experience must suit ordinary Egyptian patients, including older people and users with limited technical experience.
+
+## 6. RESPONSIVE DESIGN (MANDATORY)
+
+The website must be fully responsive and designed mobile-first.
+
+Breakpoints (suggested): 480px, 768px, 1024px, 1280px.
+
+Layout behavior:
+
+- Mobile (< 768px): single-column layout. Patient area uses a fixed bottom navigation bar. Doctor / Nurse / Admin areas use a top bar with a slide-in menu drawer.
+- Tablet (768px – 1023px): two-column grids where useful; navigation adapts.
+- Desktop (≥ 1024px): Patient area uses a top header navigation with a centered content container (max-width around 1200px). Doctor / Nurse / Admin areas use a persistent sidebar (placed on the right in RTL) with a main content area, and tables/grids use the extra width.
+
+Requirements:
+
+- No horizontal scrolling at any width from 320px up.
+- Touch targets at least 44x44px.
+- Tables convert to stacked cards on small screens.
+- Modals become full-width bottom sheets on mobile and centered dialogs on desktop.
+- Use CSS Grid / Flexbox and logical CSS properties (margin-inline-start, padding-inline-end, inset-inline-start, text-align: start) so RTL and future LTR both work.
+
+## 7. ARABIC LANGUAGE AND RTL
+
+The website must load in Arabic.
+
+- Set <html lang="ar" dir="rtl"> in index.html.
+- All primary screens must be RTL.
+- Ensure navigation, icons (e.g., arrows and chevrons mirrored correctly), layouts, lists, inputs, and buttons display correctly in RTL.
+- Use Arabic as the default language.
+- English terms may appear alongside Arabic where medically useful (e.g., medicine names). Use dir="ltr" on LTR fragments such as phone numbers, emails, and English drug names.
+- Use a locally bundled Arabic font (Cairo or Noto Sans Arabic via @fontsource).
+- Build a lightweight i18n layer (a translations dictionary + useTranslation hook, no heavy library required) so English localization and an LTR switch can be added later without redesign.
+
+## 8. APPLICATION ARCHITECTURE
+
+Use a clean and scalable structure.
+
+Suggested structure:
+
+src/
+  main.tsx
+  App.tsx
+  routes/
+    AppRoutes.tsx
+    guards/
+      RequireRole.tsx
+
+  pages/
+    public/
+      Welcome.tsx
+      Login.tsx
+      Register.tsx
+      Onboarding.tsx
+      NotFound.tsx
+
+    patient/
+      Dashboard.tsx
+      DoctorSearch.tsx
+      DoctorProfile.tsx
+      Booking.tsx
+      BookingConfirmation.tsx
+      QueueTracking.tsx
+      Appointments.tsx
+      AppointmentDetails.tsx
+      MedicalRecords.tsx
+      Prescriptions.tsx
+      PrescriptionView.tsx
+      Notifications.tsx
+      Profile.tsx
+      Help.tsx
+
+    doctor/
+      Dashboard.tsx
+      Clinics.tsx
+      Schedule.tsx
+      Patients.tsx
+      PatientProfile.tsx
+      PrescriptionBuilder.tsx
+      Notes.tsx
+      VisitWorkflow.tsx
+
+    nurse/
+      Dashboard.tsx
+      Queue.tsx
+      Patients.tsx
+      WalkIn.tsx
+
+    admin/
+      Dashboard.tsx
+      Doctors.tsx
+      Patients.tsx
+      Nurses.tsx
+      Clinics.tsx
+      Specialties.tsx
+      Locations.tsx
+      Reviews.tsx
+      Settings.tsx
+
+  layouts/
+    PublicLayout.tsx
+    PatientLayout.tsx
+    DoctorLayout.tsx
+    NurseLayout.tsx
+    AdminLayout.tsx
+
+  components/
+    common/
+    cards/
+    forms/
+    navigation/
+    modals/
+    notifications/
+    queue/
+    medical/
+
+  contexts/
+  hooks/
+  services/
+    mockAuth.ts
+    storageService.ts
+    queueService.ts
+    notificationService.ts
+    permissions.ts
+
+  data/
+    doctors.ts
+    patients.ts
+    nurses.ts
+    clinics.ts
+    appointments.ts
+    prescriptions.ts
+    medicines.ts
+    notes.ts
+    reviews.ts
+
+  types/
+  theme/
+  i18n/
+  utils/
+
+You may improve the structure while maintaining a clean separation of concerns.
+
+Use reusable components and avoid unnecessary code duplication.
+
+## 9. DEMO AUTHENTICATION AND USER ROLES
+
+Create a professional login and welcome page.
+
+Because this is a frontend prototype, authentication is simulated.
+
+Create four demo login options:
+
+### Patient
+Name: أحمد محمد
+Phone: 01012345678
+
+### Doctor
+Name: د. أحمد محمود
+Specialty: Cardiology.
+
+### Nurse
+Name: منى إبراهيم
+
+### Administrator
+Name: Platform Administrator.
+
+Allow entering each role with one click.
+
+No real passwords or OTP verification are required.
+
+Provide a clearly labeled DEMO MODE menu (in the header) for switching accounts.
+
+Every role must have different navigation and permissions.
+
+Do not show all roles' pages together.
+
+Use role-based routing: URL prefixes /patient, /doctor, /nurse, /admin, each protected by a RequireRole guard that redirects unauthorized users to the login page or their own dashboard.
+
+Persist the current session in localStorage so a refresh keeps the user logged in. Provide a logout action.
+
+## 10. PATIENT ONBOARDING GUIDE
+
+This is a mandatory feature.
+
+After a patient registers and completes their profile for the first time, automatically launch an interactive onboarding guide.
+
+The guide must be visually attractive, extremely simple, and written in clear Arabic.
+
+Create these steps:
+
+1. Welcome to the website.
+2. How to find a doctor.
+3. How to choose a clinic.
+4. How to book an appointment.
+5. How to track your queue.
+6. How to know when to visit the clinic.
+7. How to access medical records.
+8. How to view prescriptions.
+9. How to manage appointments.
+
+Each step contains:
+
+- Simple illustration or Lucide icon.
+- Arabic title.
+- Short description.
+- Next button.
+- Previous button.
+- Skip button.
+- Progress indicator.
+
+Support keyboard navigation (arrow keys, Escape to skip).
+
+Store onboarding completion in localStorage.
+
+Do not display it again after completion.
+
+Allow restarting the guide from the Help page.
+
+## 11. PATIENT AREA
+
+Build a complete patient web experience.
+
+### Patient Home
+
+Include:
+
+- Personalized welcome.
+- Doctor search.
+- Upcoming appointment.
+- Active queue card.
+- Estimated remaining time.
+- Recommended specialties.
+- Nearby clinics.
+- Medical records shortcut.
+- Recent prescriptions.
+- Notification center (bell icon with unread badge and a dropdown/panel).
+
+Keep the home page clean.
+
+### Doctor Search
+
+Search by:
+
+- Doctor name.
+- Specialty.
+- Governorate.
+- City.
+- Clinic location.
+
+Filters:
+
+- Rating.
+- Price.
+- Availability.
+- Specialty.
+
+Reflect search and filters in the URL query string so results are shareable and survive refresh.
+
+Doctor cards contain:
+
+- Avatar (initials-based).
+- Name.
+- Specialty.
+- Rating.
+- Clinic.
+- Location.
+- Consultation price.
+- Next appointment.
+- View Profile button.
+
+### Doctor Profile
+
+Display:
+
+- Doctor name.
+- Profile image (initials avatar).
+- Specialty.
+- Qualifications.
+- Biography.
+- Ratings.
+- Reviews.
+- Consultation fee.
+- Clinics.
+- Working days.
+- Working hours.
+- Available appointments.
+
+Allow selecting between multiple clinics.
+
+### Appointment Booking
+
+Build a multi-step booking flow:
+
+1. Select clinic.
+2. Select date.
+3. Select available time or queue.
+4. Review booking details.
+5. Confirm booking.
+
+Generate a booking number.
+
+Save the appointment locally.
+
+Show a professional booking confirmation page.
+
+### Live Queue Tracking
+
+Display:
+
+- Booking number.
+- Current position.
+- Patients ahead.
+- Remaining time.
+- Doctor status.
+- Clinic name.
+- Appointment date.
+- Last update.
+
+Example:
+
+Booking number: #025
+Your position: 5
+Patients ahead: 4
+Estimated waiting time: 45 minutes.
+
+The estimated time must be calculated from local mock queue data.
+
+When the nurse updates the queue, the patient interface must reflect the update. Implement this using the browser "storage" event (cross-tab sync) plus a lightweight polling interval, so a nurse in one tab and a patient in another tab can be demonstrated live.
+
+Clearly mark the estimated time as approximate.
+
+### Patient Notifications
+
+Create in-app simulated notifications:
+
+- Booking confirmed.
+- Doctor delayed.
+- Five patients ahead.
+- Two patients ahead.
+- You are next.
+- Appointment postponed.
+- Prescription available.
+
+Allow marking notifications as read.
+
+Do not use the browser Push API or system notifications in this version.
+
+### Patient Appointments
+
+Provide tabs for:
+
+- Upcoming appointments.
+- Active appointments.
+- Completed appointments.
+- Cancelled appointments.
+
+Allow:
+
+- View details.
+- Cancel booking.
+- Request postponement.
+- Open queue tracking.
+
+### Patient Medical Records
+
+Display:
+
+- Visit history.
+- Previous diagnoses.
+- Prescriptions.
+- Medical reports.
+- Laboratory results.
+- Imaging records.
+- Known allergies.
+- Uploaded medical documents (simulated list; file upload input may store only file name and metadata, never real files).
+
+Use a clear timeline.
+
+Patients must never see doctor's private notes.
+
+### Prescription Viewer
+
+Create an attractive prescription page.
+
+Display:
+
+- Doctor information.
+- Patient information.
+- Date.
+- Diagnosis.
+- Medicines.
+- Dosages.
+- Frequencies.
+- Duration.
+- Usage instructions.
+- Additional notes.
+
+Include a printable / PDF-style preview using a dedicated print stylesheet and a "Print / Save as PDF" button (window.print()).
+
+Mark all demo prescriptions clearly as simulated and not medically valid (also visible in the printed output).
+
+### Patient Profile
+
+Allow editing:
+
+- Full name.
+- Phone.
+- Birth date.
+- Gender.
+- Governorate.
+
+Include:
+
+- Notification settings.
+- Help.
+- Restart onboarding.
+- Demo account settings.
+
+## 12. DOCTOR AREA
+
+Build a separate professional doctor experience.
+
+### Doctor Dashboard
+
+Show:
+
+- Today's appointments.
+- Patients examined.
+- Waiting patients.
+- No-show patients.
+- Upcoming appointments.
+- Average examination time.
+- Ratings.
+
+Use clean summary cards. Avoid heavy chart libraries; use simple CSS/SVG bars if a chart is needed.
+
+### Clinic Management
+
+Allow the doctor to create and manage multiple clinics.
+
+Each clinic contains:
+
+- Clinic name.
+- Address.
+- Governorate.
+- City.
+- Location description.
+- Working days.
+- Start and end times.
+- Breaks.
+- Consultation price.
+- Follow-up price.
+- Daily patient limit.
+- Average examination duration.
+
+Allow adding, editing, and disabling clinics.
+
+### Schedule Management
+
+Create a weekly schedule.
+
+Allow:
+
+- Setting available days.
+- Setting hours.
+- Adding breaks.
+- Closing selected dates.
+- Pausing bookings.
+- Announcing delays.
+
+### Doctor Patient Search
+
+Search for patients by:
+
+- Full name.
+- Phone number.
+
+Opening a patient profile shows:
+
+- Previous visits.
+- Diagnoses.
+- Prescriptions previously created by the logged-in doctor.
+- Medical records accessible to that doctor.
+- Doctor-private notes written by that doctor.
+
+### Electronic Prescription Builder
+
+Build an easy-to-use prescription editor.
+
+Allow:
+
+- Selecting a patient.
+- Adding diagnosis.
+- Adding multiple medicines.
+- Editing medicines.
+- Removing medicines.
+- Saving a prescription.
+- Previewing a prescription.
+- Saving it to the patient's record.
+
+Each medicine contains:
+
+- Name.
+- Strength.
+- Dosage form.
+- Dosage.
+- Frequency.
+- Time of use.
+- Before/after food.
+- Duration.
+- Quantity.
+- Instructions.
+
+On desktop, show the editor and a live preview side by side. On mobile, use a toggle between "Edit" and "Preview".
+
+### Smart Medicine Autocomplete
+
+Use a local sample medicine catalog.
+
+When the doctor types one or two letters, display matching results in an accessible combobox (ARIA combobox/listbox pattern, keyboard navigable with arrow keys, Enter, and Escape).
+
+Support Arabic and English medicine names.
+
+Show:
+
+- Medicine name.
+- Active ingredient.
+- Strength.
+- Dosage form.
+
+Provide:
+
+- Frequently used medicines.
+- Favorite medicines.
+- Recently used medicines.
+- Saved prescription templates.
+
+Allow selecting medicines and adding them to a prescription.
+
+Never automatically prescribe medicine or invent doses.
+
+All prescription details must be entered and approved by the doctor.
+
+## 13. DOCTOR PRIVATE NOTES
+
+This is a critical feature.
+
+Create a private clinical notes section connected to each patient and the doctor who created the note.
+
+The doctor can add personal notes after examining a patient.
+
+Each note stores:
+
+- Unique note ID.
+- Patient ID.
+- Doctor ID.
+- Visit ID.
+- Note content.
+- Created date.
+- Updated date.
+
+When the same doctor searches for the patient later, display:
+
+- Previous private notes written by that doctor.
+- Previous prescriptions created by that doctor.
+- Previous visit dates.
+- Previous diagnoses.
+
+Allow:
+
+- Adding notes.
+- Editing notes.
+- Pinning important notes.
+- Viewing notes chronologically.
+
+CRITICAL PRIVACY:
+
+- A doctor can only view their own private notes.
+- Patients cannot see private notes.
+- Nurses cannot see private notes.
+- Other doctors cannot see another doctor's private notes.
+- Admin accounts must not automatically gain access to private clinical notes.
+
+Enforce these permissions in every page, in route guards, and inside every data-access function (src/services/permissions.ts and the storage layer), not only in the UI.
+
+Never expose private notes through shared patient records.
+
+## 14. DOCTOR VISIT WORKFLOW
+
+Create a complete examination workflow:
+
+1. Doctor opens today's patient list.
+2. Selects the patient.
+3. Reviews previous visits and medical records.
+4. Reviews their own previous private notes.
+5. Records the current diagnosis.
+6. Writes a prescription if necessary.
+7. Adds new private notes.
+8. Completes the visit.
+
+Save the visit locally.
+
+## 15. NURSE / RECEPTIONIST AREA
+
+Create a separate operational dashboard optimized for a reception desk (desktop first, but fully usable on tablet and phone).
+
+### Nurse Dashboard
+
+Display:
+
+- Total bookings.
+- Waiting patients.
+- Arrived patients.
+- Currently examining.
+- Completed examinations.
+- No-show patients.
+- Next patient.
+
+### Daily Patient Queue
+
+Create an easy-to-read queue (table on desktop, cards on mobile) containing:
+
+- Patient name.
+- Phone.
+- Booking number.
+- Booking time.
+- Position.
+- Status.
+
+Statuses:
+
+- Booked.
+- Waiting.
+- Arrived.
+- In Examination.
+- Completed.
+- No Show.
+- Cancelled.
+
+Statuses must show both an icon/label and a color (never color alone).
+
+### Start Examination
+
+When a patient enters:
+
+The nurse presses "Start Examination".
+
+Update the patient status to "In Examination".
+
+Display the current patient prominently.
+
+### Finish Examination & Call Next
+
+After the examination ends:
+
+- Nurse presses "Finish Examination & Call Next".
+- Previous patient becomes Completed.
+- Next eligible patient automatically moves into examination.
+- Queue positions update.
+- Remaining waiting times recalculate.
+- Patient notifications update.
+
+Prevent multiple active examinations unless explicitly configured for multiple consultation rooms.
+
+### Walk-in Patients
+
+Allow adding patients without online booking.
+
+Fields:
+
+- Patient name.
+- Phone.
+- Optional age.
+- Queue position.
+- Administrative notes.
+
+### Queue Controls
+
+Allow:
+
+- Postponing patients.
+- Marking patients as No Show.
+- Cancelling bookings.
+- Moving patients up or down (buttons; drag-and-drop optional, with button fallback for accessibility).
+- Adding a reason for manual changes.
+
+Display confirmation dialogs for important changes.
+
+### Communication
+
+Provide simulated buttons to:
+
+- Call the patient (simulated; may render a tel: link on mobile but must not require it).
+- Send a notification.
+- Notify that the turn is approaching.
+- Announce a delay.
+
+Nurses must not edit medical diagnoses, prescriptions, or private doctor notes.
+
+## 16. SUPER ADMIN AREA
+
+Create an administrative web dashboard with a sidebar layout.
+
+### Dashboard
+
+- Total doctors.
+- Total patients.
+- Total clinics.
+- Daily bookings.
+- Active bookings.
+- Reviews.
+
+### Doctor Management
+
+- View.
+- Search.
+- Approve.
+- Reject.
+- Edit.
+- Suspend demo accounts.
+
+### Patient Management
+
+- View patients.
+- Search patients.
+- View basic account information.
+
+Do not expose private clinical notes.
+
+### Nurse Management
+
+- View nurses.
+- Create demo nurse accounts.
+- Assign nurses to clinics.
+- Edit accounts.
+
+### Specialties
+
+Manage specialties.
+
+### Geographic Locations
+
+Include sample Egyptian locations:
+
+- Cairo.
+- Giza.
+- Beni Suef.
+- Fayoum.
+- Minya.
+- Alexandria.
+
+Include relevant cities and districts.
+
+### Reviews and Complaints
+
+Display and manage sample reports and reviews.
+
+## 17. RATINGS AND REVIEWS
+
+Only patients with completed appointments can submit reviews.
+
+Include:
+
+- Overall five-star rating (accessible star input, keyboard operable).
+- Doctor communication.
+- Punctuality.
+- Clinic organization.
+- Optional comment.
+
+Allow viewing submitted reviews.
+
+## 18. CLINIC LOCATIONS
+
+Do not connect to external Maps APIs or embed external maps.
+
+Create a lightweight clinic-location card.
+
+Display:
+
+- Clinic address.
+- Governorate.
+- City.
+- Location description.
+- Distance placeholder.
+
+The directions button should show a simulated action (a toast or modal stating that directions are simulated in demo mode).
+
+## 19. DEMO DATA
+
+Preload realistic Egyptian sample data:
+
+- 8 doctors.
+- 12 patients.
+- 4 nurses.
+- 6 clinics.
+- 6 specialties.
+- 15 appointments.
+- 8 prescriptions.
+- 10 medicines.
+- Several doctor-private notes.
+- Several reviews.
+- Multiple queue states.
+
+Use consistent relationships between records (IDs must reference each other correctly).
+
+Include realistic Egyptian names and phone number formats.
+
+The prototype must be completely testable using sample data.
+
+## 20. LOCAL STORAGE AND DATA MANAGEMENT
+
+Use localStorage through a reusable, typed storage service (namespaced keys such as "maw3edy:v1:appointments", with a schema version for future migrations).
+
+The website must:
+
+- Seed demo data on first visit.
+- Save all changes locally.
+- Restore changes after page refresh and browser restart.
+- Preserve appointments.
+- Preserve queue updates.
+- Preserve prescriptions.
+- Preserve private notes.
+- Preserve notifications.
+- Preserve user profile edits.
+- Handle storage errors gracefully (quota exceeded, storage disabled, private mode) with a clear Arabic message.
+
+Create a Reset Demo Data option.
+
+Ask for confirmation before resetting.
+
+Do not store real patient medical information in this prototype. Show a visible demo banner stating that all data is fictional and stored only in this browser.
+
+## 21. ROUTING AND WEB UX
+
+Use React Router.
+
+Create separate route groups for:
+
+- Public / authentication.
+- Patient.
+- Doctor.
+- Nurse.
+- Administrator.
+
+Requirements:
+
+- Every page has a unique, meaningful URL (e.g., /patient/doctors/:doctorId, /patient/booking/:doctorId, /doctor/patients/:patientId).
+- Browser back/forward buttons work correctly.
+- Deep links and page refresh work (configure SPA fallback; include a vercel.json / public/_redirects example, or use HashRouter when targeting plain static hosting).
+- Unknown URLs show a friendly Arabic 404 page.
+- Update document.title per page (in Arabic).
+- Use lazy loading (React.lazy + Suspense) for each role's route group to keep the initial bundle small.
+- Focus moves to the main heading on route change, and scroll resets to top.
+- Avoid unnecessary nested routing.
+- Include a favicon and basic meta tags (theme-color #0B434C, viewport, description).
+- Optional: basic PWA manifest so the site can be "installed" from the browser; no service-worker complexity required.
+
+## 22. PERFORMANCE
+
+The website must be lightweight.
+
+Requirements:
+
+- Avoid unnecessary dependencies.
+- Code-split by role/route.
+- Virtualize or paginate long lists only if lists grow large; otherwise render efficiently with stable keys.
+- Avoid excessive re-rendering; use memoization (memo, useMemo, useCallback) where beneficial.
+- Avoid large images; prefer SVG/icons and initials-based avatars.
+- Avoid heavy chart libraries.
+- Avoid excessive animations; respect prefers-reduced-motion.
+- Avoid unnecessary timers and background work (polling only on queue-related pages).
+- Self-host fonts and subset them where possible.
+- Keep first load fast; target a good Lighthouse score (Performance, Accessibility, Best Practices ≥ 90).
+
+## 23. ACCESSIBILITY
+
+Provide:
+
+- Clear Arabic text.
+- Readable font sizes (minimum 16px body text).
+- Good color contrast (WCAG AA).
+- Large touch targets.
+- Semantic landmarks and heading hierarchy.
+- Labels for every form control, with clear inline validation errors linked via aria-describedby.
+- Visible focus styles on all interactive elements.
+- Full keyboard operability, including modals (focus trap, Escape to close, focus return).
+- aria-live regions for toasts, queue updates, and notifications.
+- Skip-to-content link.
+- Never depend on color alone to communicate status.
+
+## 24. CODE QUALITY
+
+Use strict TypeScript typing.
+
+Avoid unnecessary use of any.
+
+Build reusable components.
+
+Separate UI from business logic.
+
+Keep data services separate from pages.
+
+Implement proper error handling (including an error boundary).
+
+Use reusable validation functions (Arabic validation messages; Egyptian phone format validation such as 01XXXXXXXXX).
+
+Do not duplicate logic across roles.
+
+Configure ESLint and Prettier.
+
+Keep the project organized and maintainable.
+
+## 25. FINAL TESTING REQUIREMENTS
+
+Test all major flows:
+
+1. Patient demo login.
+2. Patient registration.
+3. Patient onboarding.
+4. Doctor search.
+5. Doctor profile.
+6. Appointment booking.
+7. Queue tracking.
+8. Appointment cancellation.
+9. Patient notifications.
+10. Nurse demo login.
+11. Start examination.
+12. Finish examination.
+13. Call next patient.
+14. Doctor demo login.
+15. Patient search.
+16. Prescription creation.
+17. Medicine autocomplete.
+18. Doctor private notes.
+19. Privacy permissions (including direct URL access attempts to forbidden routes).
+20. Admin dashboard.
+21. localStorage persistence.
+22. Page refresh and browser restart.
+23. Reset demo data.
+24. Cross-tab queue sync (nurse tab updates patient tab).
+25. Responsive layouts at 360px, 768px, 1024px, and 1440px.
+26. RTL correctness.
+27. Browsers: latest Chrome, Edge, Firefox, and Safari (desktop and mobile).
+28. Keyboard-only navigation and screen-reader sanity check.
+29. Print / PDF output of a prescription.
+30. Production build (npm run build) and preview (npm run preview) with no console errors or TypeScript errors.
+31. Visual QA pass using the checklist in section 35, plus a review of the /dev/ui style guide.
+
+Resolve all errors.
+
+Verify all route navigation.
+
+Make sure every important button performs its expected action.
+
+Do not leave empty placeholder pages.
+
+## 26. FRONTEND EXCELLENCE STANDARD (READ BEFORE BUILDING ANY UI)
+
+Sections 26 to 35 define the professional frontend and visual-design standard of the website. When any earlier section is less specific about a visual or layout detail, these sections take precedence.
+
+The target quality bar: the website must look and behave like a funded, professionally designed healthcare product (the level of a polished SaaS or a leading clinic-booking platform), not like a generated template.
+
+Non-negotiable principles:
+
+1. Consistency: the same element looks, behaves, and sits in the same place on every page and every role.
+2. Hierarchy: on every screen there is exactly one primary action, one clear page title, and a clear reading order.
+3. Alignment: everything snaps to the spacing grid; nothing is "almost aligned".
+4. Completeness: every data-driven view has loading, empty, error, and populated states, all designed.
+5. Restraint: few colors, few font sizes, few shadows, few animations, applied with discipline.
+6. Accessibility is part of the design, not an afterthought.
+
+## 27. DESIGN TOKENS AND FOUNDATIONS
+
+Extend src/theme/tokens.css with the following systems. No component may use a raw pixel, color, or duration that is not a token.
+
+### Spacing scale (4px base)
+
+--space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px; --space-16: 64px; --space-20: 80px.
+
+Rules:
+- Padding inside cards: 16px mobile, 20px tablet, 24px desktop.
+- Gap between cards in a grid: 16px mobile, 24px desktop.
+- Vertical gap between page sections: 32px mobile, 40px desktop.
+- Page horizontal padding: 16px mobile, 24px tablet, 32px desktop.
+
+### Color tints
+
+Only tints and shades of the three brand colors, the two semantic colors, and the neutrals may be derived (for hover, pressed, subtle backgrounds, and borders). Do not introduce new hues. Define them as tokens, for example:
+
+- --color-teal-hover, --color-teal-pressed, --color-teal-subtle (very light teal for selected rows and active nav items).
+- --color-orange-hover, --color-orange-pressed, --color-orange-subtle (very light orange for highlighted callouts).
+- --color-green-subtle and --color-red-subtle (very light backgrounds for status badges and alerts, always paired with the full-strength color for text/icon and a visible label).
+
+### Orange contrast rule (important)
+
+Neon orange (#FF5533) on white does not meet WCAG AA for small text. Therefore:
+- Orange is used for: primary call-to-action fills, active indicators, focus rings, key icons at 24px or larger, progress fills, badges' accent dots, and large numbers (24px or larger).
+- White text on an orange fill is allowed only for labels that are bold and at least 18.7px (WCAG large text). Standard-size buttons use a dark teal fill with white text.
+- Never use orange for small body text, small links, or thin 1px strokes on white.
+- Orange text on white is allowed only at 24px or larger.
+
+### Typography
+
+Font: Cairo (bundled locally). Weights used: 400, 600, 700 only.
+
+Type scale (use fluid sizes with clamp where noted):
+- Display: clamp(28px, 4vw, 40px) / line-height 1.3 / weight 700 (welcome page only).
+- H1: clamp(24px, 3vw, 30px) / 1.4 / 700.
+- H2: 22px / 1.4 / 700.
+- H3: 18px / 1.5 / 600.
+- Body: 16px / 1.75 / 400.
+- Body strong: 16px / 1.75 / 600.
+- Small: 14px / 1.6 / 400.
+- Caption: 13px / 1.5 / 400 (never below 13px).
+
+Arabic typography rules:
+- Arabic needs generous line-height (1.6 to 1.8 for body text).
+- No letter-spacing on Arabic text. No italics. No uppercase transforms.
+- Use text-wrap: balance on headings and text-wrap: pretty on paragraphs.
+- Use bdi or dir="ltr" for embedded Latin fragments, phone numbers, emails, and English drug names so punctuation does not jump around in RTL.
+- Use tabular numbers (font-variant-numeric: tabular-nums) for prices, queue numbers, times, and table columns.
+
+### Numbers, dates, currency, and plurals
+
+- Digits: Western digits (0 to 9) by default for phone numbers, booking numbers, times, and prices. Provide a formatNumber utility so Arabic-Indic digits can be enabled later from one place.
+- Dates: Intl.DateTimeFormat with the ar-EG locale and Gregorian calendar, for example "الخميس، 5 نوفمبر 2026".
+- Time: 12-hour format with Arabic markers (ص and م).
+- Currency: Egyptian pounds via Intl.NumberFormat, shown as "350 ج.م".
+- Arabic plural rules via Intl.PluralRules (for example: مريض واحد، مريضان، 3 مرضى، 11 مريضًا). Build a small pluralize helper; never write "مريض(ين)".
+- Relative time in Arabic (for example "منذ 5 دقائق") via Intl.RelativeTimeFormat.
+
+### Radius, borders, and elevation
+
+- Radius: 10px (inputs, chips), 12px (buttons, small cards), 16px (cards, modals). Avatars are circles.
+- Borders: 1px solid var(--color-border) is the default separator. Prefer borders to shadows.
+- Elevation (maximum three levels): none (default cards, border only), sm (dropdowns, sticky bars), md (modals and bottom sheets). Shadows are soft and low-opacity, tinted with dark teal rather than pure black.
+
+### Iconography
+
+- lucide-react only. Stroke width 1.75. Sizes: 16 (inline in text), 20 (buttons and inputs), 24 (navigation and cards), 32 and above (empty states and onboarding).
+- Icons that imply direction (chevrons, arrows, "back", "next", progress arrows) must be mirrored in RTL. Icons that do not imply direction (clock, check, calendar, phone, bell, search, map pin) must NOT be mirrored.
+- Icon plus label is preferred for navigation; icon-only buttons must have an accessible name and a tooltip.
+- Each domain concept uses the same icon everywhere (for example: calendar for appointments, users for the queue, stethoscope for doctors, pill for medicines, file-text for records, map-pin for locations).
+
+### Motion
+
+- Durations: 120ms (hover and press), 200ms (dropdowns, tabs), 280ms (modals, sheets, page fades). Easing: cubic-bezier(0.2, 0, 0, 1) for entering, ease-in for leaving.
+- Allowed motion: opacity, small translate (maximum 8px), and scale 0.98 to 1. No bouncing, no parallax, no auto-playing animation.
+- Respect prefers-reduced-motion by disabling all non-essential motion.
+
+### Z-index scale
+
+--z-base: 0; --z-sticky: 100; --z-dropdown: 200; --z-drawer: 300; --z-modal: 400; --z-toast: 500; --z-demo-banner: 600. No arbitrary z-index values anywhere.
+
+## 28. COMPONENT LIBRARY SPECIFICATION
+
+Build a small internal component library in src/components/common and src/components/forms. Every component is fully typed, accessible, and supports every state listed below: default, hover, focus-visible, active/pressed, disabled, loading, error (where relevant).
+
+### Buttons
+
+- Variants: primary (orange fill, only one per view), secondary (dark teal fill), outline (teal border), ghost (text only), danger (red, for destructive actions only), success-confirm (green, only for confirm-complete actions such as "Finish Examination").
+- Sizes: sm 40px, md 48px (default), lg 56px (booking confirmation and key mobile CTAs). Minimum touch target 44px.
+- Icon placement: icon on the leading side of the label (right side in RTL). Loading state replaces the icon with a spinner and keeps the button width stable.
+- Full-width on mobile when it is the primary action of a form.
+
+### Form controls
+
+- Labels always sit above the field (never placeholder-only labels). Required fields are marked with an Arabic "(مطلوب)" text, not only an asterisk.
+- Input height 48px, radius 10px, 1px border, focus shows a 2px orange ring with offset. Font size at least 16px so mobile browsers do not zoom.
+- Helper text below the field in secondary color; error text below the field in red with an alert icon. Errors are linked with aria-describedby and the field uses aria-invalid.
+- Validation happens on blur and on submit (not on every keystroke), with a short error summary at the top of long forms that links to the first invalid field.
+- Provide: TextInput, PhoneInput (Egyptian format with LTR display), TextArea (with character counter), Select, Combobox (searchable), Checkbox, RadioGroup, Switch, SegmentedControl, DatePicker, TimeSlotPicker, SearchInput (with clear button and keyboard shortcut hint on desktop), StarRatingInput, FileDropzone (simulated, stores metadata only).
+- DatePicker: custom lightweight calendar with Arabic month and weekday names, week starting on Saturday, disabled dates clearly marked, today highlighted, selected day in dark teal, available days marked with a small orange dot. Fully keyboard operable.
+- TimeSlotPicker: responsive grid of selectable chips, grouped as "صباحًا" and "مساءً", unavailable slots visibly disabled with a strikethrough style and aria-disabled, selected slot filled in dark teal with a check icon.
+
+### Display components
+
+- Card (flat, bordered, optional interactive variant with hover border and subtle teal background).
+- StatusBadge: icon plus Arabic label plus tinted background. Mapping: Booked (teal), Waiting (orange-subtle with clock icon), Arrived (teal with user-check), In Examination (teal solid with activity icon), Completed (green with check), No Show (neutral-dark with user-x), Cancelled (red with x-circle). Color is never the only signal.
+- Avatar: circle with initials, background chosen deterministically from brand tints, sizes 32, 40, 56, 96.
+- Tabs (underline style, scrollable on mobile with fade edges), SegmentedControl, Breadcrumbs (mirrored separators), Accordion, Timeline (vertical, line on the start side), Stepper (horizontal on desktop, compact "الخطوة 2 من 5" with a progress bar on mobile), Rating (read-only stars with numeric value and review count), ProgressBar and ProgressRing (SVG), Tooltip, DropdownMenu, Pagination, Skeleton, EmptyState, ErrorState, InlineAlert (info, success, warning, error), Toast, ConfirmDialog, BottomSheet.
+- Table: sticky header, zebra not required, row hover with subtle teal, density options (comfortable and compact), sortable columns with aria-sort, row actions in a trailing overflow menu, and automatic conversion to stacked cards below 768px.
+
+### Overlays
+
+- Modal: centered on desktop (max width 560px, radius 16px), bottom sheet on mobile (full width, top radius 16px, drag handle, safe-area padding). Focus trap, Escape to close, backdrop click closes only non-destructive modals, focus returns to the trigger.
+- ConfirmDialog for destructive actions: red confirm button on the end side, neutral cancel button on the start side, clear consequence text in Arabic ("سيتم إلغاء الحجز ولا يمكن التراجع").
+- Toast: announced via aria-live, auto-dismiss after 5 seconds (persistent for errors), maximum 3 visible, includes an icon and an optional "تراجع" (undo) action for reversible operations.
+
+### Loading, empty, and error states
+
+- Use skeleton placeholders that match the final layout (not generic spinners) for pages and lists. Simulate realistic latency of 250 to 600ms in the mock services so skeletons are actually visible and layout shift is verified.
+- EmptyState: 32px icon in a light-teal circle, a short title, one-line explanation, and a primary action when one exists (for example "لا توجد حجوزات قادمة" with a "احجز موعد" button).
+- ErrorState: clear Arabic message, retry button, and no technical jargon.
+
+## 29. LAYOUT AND ELEMENT PLACEMENT (PROFESSIONAL POSITIONING)
+
+Every element must have a deliberate, consistent position. Directions below are for RTL: "start" means right and "end" means left.
+
+### Global grid
+
+- 12-column grid on desktop with 24px gutters, 4-column grid on mobile with 16px gutters.
+- Content max widths: patient area 1200px, doctor and nurse content 1280px, admin content 1440px. Content is centered; on very wide screens the background fills the rest.
+- Main content area has a minimum height of 100dvh minus header. Use dvh units, never 100vh, so mobile browser toolbars do not break layouts.
+
+### Application shells
+
+Patient shell:
+- Desktop: top header (height 64px, dark teal). Logo and site name at the start; primary navigation links in the center-start (الرئيسية، الأطباء، حجوزاتي، السجل الطبي، الروشتات); search shortcut, notification bell with unread badge, and user menu (avatar plus name) at the end. The user menu contains profile, help, demo account switcher, and logout.
+- Mobile: compact top bar (height 56px) with logo at the start and the bell at the end; fixed bottom navigation (height 64px plus safe-area inset) with exactly five items: الرئيسية، الأطباء، حجوزاتي، السجل، حسابي. The active item uses an orange indicator bar above the icon and a bold label. Page content has bottom padding equal to the nav height.
+
+Doctor, nurse, and admin shells:
+- Desktop: persistent sidebar of 264px at the start side (collapsible to a 76px icon rail with tooltips), dark teal background. Sidebar order from top: logo and site name, role badge, grouped navigation with small group labels, then at the bottom: the DEMO MODE account switcher, then the user card with logout.
+- Top bar inside the content area (height 64px, white, bottom border): page title or breadcrumb at the start; global search (admin and doctor), notifications, and the date/clinic selector at the end.
+- Mobile and tablet: top bar with a menu button at the start that opens the sidebar as a slide-in drawer from the start side; the drawer has a dimmed backdrop, focus trap, and closes on route change. The nurse area additionally keeps a sticky bottom action bar on the queue page (see below).
+
+### Demo mode indicator
+
+- A slim, always-visible banner (height 32px) at the very top of every page: "وضع تجريبي: كل البيانات وهمية ومحفوظة في متصفحك فقط", with a "إعادة ضبط" link at the end. It cannot be permanently dismissed (it may be collapsed to a small "DEMO" pill at the top corner for the current session).
+- The DEMO account switcher is only in the user menu (patient) or the sidebar bottom (other roles), never scattered elsewhere.
+
+### Page anatomy (identical on all pages)
+
+1. Breadcrumb (desktop only, except on first-level pages).
+2. Page header row: title (H1) and optional one-line description at the start; the single primary action at the end (desktop) with secondary actions to its left side in order of importance. On mobile, the primary action moves to a sticky bottom bar or becomes full width below the title.
+3. Optional toolbar row: search at the start, filters in the middle, view toggles and sort at the end.
+4. Content area with cards or table.
+5. Footer area: pagination or "load more" at the center; legal and demo disclaimer in the site footer.
+
+### Forms
+
+- Single column on mobile. On desktop, two columns for short fields (name and phone, city and governorate), full width for long fields (address, notes).
+- Group related fields in titled sections separated by 32px and a thin divider.
+- Form footer: sticky on mobile. Primary action at the start side, secondary or cancel at the end side (RTL reading order puts the primary action first). Destructive actions are separated visually from the primary actions and never placed adjacent to the primary action.
+- Multi-step flows (booking, onboarding): stepper at the top, content in the middle, navigation buttons at the bottom with "التالي" (primary) at the start and "السابق" (ghost) next to it; progress is always visible.
+
+### Cards and grids
+
+- Doctor cards: 3 columns on desktop, 2 on tablet, 1 on mobile. All cards in a row have equal height; the action button is pinned to the bottom of the card.
+- KPI cards: 4 per row on desktop, 2 on tablet and mobile.
+- Card anatomy: icon or avatar at the start, title and meta in the center, status or action at the end; a thin divider before the footer actions.
+
+### Tables and toolbars
+
+- Toolbar above the table: search input at the start, filters next to it, bulk actions and "add" button at the end.
+- Column alignment: text columns aligned to the start, numeric columns aligned to the end with tabular numbers, action column last and narrow.
+- Row actions: primary quick action visible, secondary actions inside an overflow menu.
+
+### Overlay and feedback placement
+
+- Toasts: top-center on mobile (below the top bar), bottom-start on desktop.
+- Dropdowns open toward the available space and align to the trigger's start edge, flipping when near the viewport edge.
+- Notifications panel: popover anchored under the bell on desktop (width 380px), full-screen page on mobile.
+- Tooltips appear after 400ms hover or on keyboard focus and never contain essential information.
+
+### Sticky and fixed elements
+
+- Maximum two sticky layers at once (top bar plus either a sub-toolbar or a bottom bar). Sticky elements have a subtle bottom border or shadow-sm only when content scrolls beneath.
+- Use scroll-padding-top equal to the sticky header height so anchored sections are never hidden.
+
+## 30. PAGE-BY-PAGE LAYOUT BLUEPRINTS
+
+Implement these exact layouts (adapting per breakpoint as described).
+
+### Welcome / Login
+
+- Desktop: two panels. The end-side panel (dark teal, 45% width) holds the brand, a one-line value proposition, and three short benefit items with icons (احجز بسهولة، تابع دورك، سجلّك الطبي في مكان واحد). The start-side panel (white) holds the form card: title, four large role cards ("دخول كمريض"، "دخول كطبيب"، "دخول كممرضة"، "دخول كمدير النظام"), each showing role icon, demo name, and a one-click button. A secondary link for "إنشاء حساب مريض جديد".
+- Mobile: brand header block on top (dark teal, compact), role cards stacked below.
+- No stock photos. Use simple SVG shapes and icons only.
+
+### Patient Home
+
+- Greeting header: "مرحبًا، أحمد" with the date on the end side.
+- Row 1: large search card (search input, quick specialty chips).
+- Row 2: two-column layout on desktop. Main column (about 66%): active queue card (if any) then upcoming appointment card. Side column (about 33%): quick actions grid (السجل الطبي، الروشتات، حجوزاتي، المساعدة).
+- Row 3: recommended specialties as a horizontally scrollable chip row (scroll-snap) on mobile and a grid on desktop.
+- Row 4: nearby clinics (location cards, see section 31).
+- Row 5: recent prescriptions list (maximum 3) with "عرض الكل".
+- The active queue card is the visual hero when it exists: dark teal background, large queue number, patients ahead, approximate time, and a single "تتبع دورك" button.
+
+### Doctor Search
+
+- Desktop: sticky filter sidebar at the start (width 280px) with grouped filters (التخصص، المحافظة، المدينة، السعر as a range, التقييم, التوفر), a "مسح الكل" link, and active-filter chips above the results. Results grid at the center with the result count and a sort dropdown at the top.
+- Mobile: search bar and a "تصفية" button that opens a bottom sheet with filters and an "عرض النتائج (12)" confirm button.
+
+### Doctor Profile
+
+- Header card: avatar (96px), name, specialty, rating, years of experience, and verified-style badge (demo).
+- Desktop: two columns. Main column: tabs (نبذة، العيادات، التقييمات). Side column: sticky booking card (clinic selector, fee, next available slot, primary "احجز الآن" button).
+- Mobile: single column with a sticky bottom bar showing the fee and the "احجز الآن" button.
+
+### Booking Flow
+
+- Stepper at the top. Left (end side) summary panel on desktop showing the live booking summary (doctor, clinic, date, time, fee); on mobile the summary is a collapsible card above the buttons.
+- Step content card in the main column; navigation buttons at the bottom of the card.
+- Confirmation page: large green check, booking number in a prominent card, a clear summary, and three actions in order: "تتبع دورك" (primary), "إضافة للتقويم" (simulated), "العودة للرئيسية" (ghost).
+
+### Queue Tracking
+
+- Hero card centered: huge booking number, current position as a large number with a label, a horizontal progress track showing "أنت هنا" relative to the current examination marker, patients ahead, approximate remaining time (labeled "تقريبي"), doctor status badge, and "آخر تحديث" with relative time updating live.
+- Below: details card (clinic, date, doctor) and a "ماذا يعني هذا؟" explainer for older users in plain Arabic.
+- Live updates are announced via aria-live politely and highlighted with a brief background pulse (disabled for reduced motion).
+
+### Medical Records
+
+- Desktop: left timeline (visit cards connected by a vertical line with date markers), right sticky summary card (allergies, chronic conditions, latest vitals placeholder). Tabs or filter chips for type (زيارات، تحاليل، أشعة، تقارير).
+- Mobile: summary card collapsed on top, timeline below.
+
+### Prescription View
+
+- Document-style layout on a white "paper" card (max width 794px, mimicking A4 proportion) with a header (doctor and clinic), patient block, diagnosis, a clean medicines table (name and strength, dosage, frequency, duration, instructions), notes, and a footer carrying a clear diagonal or banner "روشتة تجريبية — غير صالحة طبيًا" that also appears in print. Toolbar above the paper: طباعة / حفظ PDF (primary), رجوع.
+
+### Doctor Dashboard
+
+- Row 1: KPI cards. Row 2: left "قائمة اليوم" (today's patients list with status and quick "ابدأ الكشف" action), right column with average examination time card and ratings summary. Row 3: upcoming appointments table.
+
+### Prescription Builder
+
+- Desktop: two panes. Start pane: patient header (name, age, allergies badge), diagnosis field, medicines list with an "إضافة دواء" combobox at the top, each medicine as an expandable card (collapsed summary line, expanded form). End pane: live paper preview (sticky). Footer sticky bar: "حفظ الروشتة" (primary), "حفظ كقالب" (outline), "إلغاء".
+- Mobile: segmented control switches "تحرير" and "معاينة".
+
+### Doctor Patient Profile
+
+- Header with patient identity and allergy badge. Tabs: نظرة عامة، الزيارات، الروشتات، ملاحظاتي الخاصة. The private notes tab carries a lock icon and the text "لا يراها غيرك" to make privacy explicit. Pinned notes appear first with a pin icon.
+
+### Visit Workflow
+
+- Horizontal stepper (vertical timeline on mobile) with the eight workflow steps. Left context panel (previous visits and own private notes), main panel for the current step, sticky footer with "حفظ ومتابعة" and "إنهاء الكشف".
+
+### Nurse Queue (control-room layout)
+
+- Top: KPI strip (compact). Below: two columns on desktop.
+  - Main column (about 65%): "الحالة الحالية" hero card showing the patient currently in examination with elapsed time, followed by the queue list/table with drag handle (optional), position, name, booking number, status badge, and row actions.
+  - Side column (about 35%): next patient card, the big primary action "إنهاء الكشف واستدعاء التالي" (green confirm style), "بدء الكشف" action, "إضافة حالة بدون حجز" button, and communication shortcuts (إرسال إشعار، إعلان تأخير).
+- Mobile: queue as cards; sticky bottom action bar holding the two main actions (بدء الكشف and إنهاء واستدعاء التالي) so the nurse can operate one-handed.
+- Large, readable text and generous row height because this screen is used all day.
+
+### Admin Pages
+
+- Standard table pages: header with count and "إضافة" action, toolbar with search and filters, table, pagination. Detail edit uses a side drawer (width 480px) from the end side on desktop and a full-screen sheet on mobile. Approve/reject actions are visible in the row and in the detail drawer.
+
+## 31. CLINIC LOCATIONS AND PLACES (PROFESSIONAL PRESENTATION)
+
+Because no external map API is allowed, clinic locations must still look premium and be genuinely useful.
+
+### Location selection controls
+
+- Cascading selectors: المحافظة (governorate) then المدينة (city) then optionally المنطقة (district). Selecting a governorate filters the cities; changing it resets the dependent fields. Use searchable comboboxes with Arabic normalization (ignore hamza and ta-marbuta variations, and diacritics) so typing "اسكندرية" finds "الإسكندرية".
+- Sample data covers Cairo, Giza, Beni Suef, Fayoum, Minya, and Alexandria with realistic cities and districts (for example: مدينة نصر، المعادي، الهرم، الدقي، سموحة، سيدي بشر، بني سويف، الفيوم، المنيا).
+- Show the user's selected location as a removable chip near the search ("القاهرة، مدينة نصر ×").
+
+### Clinic location card (reusable component: ClinicLocationCard)
+
+Anatomy from top to bottom:
+1. Header row: clinic name (H3) at the start, a StatusBadge "مفتوحة الآن" or "مغلقة" at the end, computed from working hours.
+2. Visual strip (height 120px): a stylized abstract map placeholder drawn with inline SVG (soft light-teal street grid lines, a dark teal pin with an orange center dot, subtle border), clearly not a real map and with a small "خريطة توضيحية" caption.
+3. Address block: map-pin icon, full address, then governorate and city as two small chips, then a one-line landmark description ("بجوار محطة مترو ...").
+4. Meta row (3 compact items with icons): distance placeholder ("حوالي 3 كم" marked as approximate), working hours today, consultation price.
+5. Actions row: "الاتجاهات" (outline button, opens a simulated-action dialog explaining directions are simulated), "نسخ العنوان" (ghost button with copy confirmation toast), and "اتصال" (ghost, simulated).
+
+States: selected (teal border and subtle background, used in the booking flow), disabled clinic (muted with "العيادة متوقفة حاليًا"), loading skeleton.
+
+### Places in lists and flows
+
+- Booking step 1 shows clinics as selectable ClinicLocationCards in a radio-group pattern (the whole card is the radio target, with a visible check indicator).
+- Doctor cards show only a compact location line (map-pin icon, city and district, distance placeholder) to avoid clutter.
+- Nearby clinics on the patient home: horizontal scroll-snap row on mobile, 3-column grid on desktop, sorted by the placeholder distance.
+- Admin and doctor clinic forms use the same cascading selectors and show a live preview of the ClinicLocationCard beside the form on desktop.
+
+## 32. MICRO-INTERACTIONS, FEEDBACK, AND POLISH
+
+- Every clickable element has a visible hover (desktop), pressed (all devices), and focus-visible state. Cards that are links lift only by border and background change, not by large shadows.
+- Buttons that trigger async operations show loading, then success feedback (toast or inline check) and never remain ambiguous.
+- Optimistic updates for low-risk actions (mark notification as read, pin a note) with rollback on failure.
+- Form submit: disable the submit button while processing, move focus to the first error if invalid, show a success toast and navigate to the logical next page when valid.
+- Destructive or irreversible actions always require a ConfirmDialog; reversible ones use a toast with "تراجع".
+- Page transitions: a 200ms fade; no sliding page transitions.
+- Count-up animations, confetti, and decorative animations are not allowed. The only celebratory moment is the animated check on booking confirmation (a short SVG stroke animation, disabled for reduced motion).
+- Long text rules: names truncate with ellipsis in compact cards (with the full name in a title or tooltip), descriptions clamp to 2 lines, and nothing ever overflows its container. Test with very long Arabic names and addresses.
+- Skeletons match final layout dimensions so Cumulative Layout Shift stays below 0.1.
+- Scroll behavior: restore scroll position on back navigation, scroll to top on new route, and smooth-scroll only for in-page anchors.
+- Mobile browser details: use env(safe-area-inset-*) for fixed bars, 100dvh instead of 100vh, input font size at least 16px, -webkit-tap-highlight-color transparent with custom pressed states, overscroll-behavior contain inside drawers and sheets, and touch-action tuned for horizontal scrollers.
+- Copy writing: short Arabic sentences, action-oriented button labels ("احجز الآن"، "تأكيد الحجز", never "إرسال" or "OK"), friendly error messages that explain what to do next, consistent terminology across the whole site (one word per concept).
+
+## 33. DATA VISUALIZATION AND DASHBOARD DETAILS
+
+- No chart libraries. Build lightweight SVG components: Sparkline, BarMini, ProgressRing, and a segmented horizontal bar for status distribution.
+- KPI card anatomy: icon in a light-teal rounded square at the start, label in secondary text, large tabular number (28 to 32px, weight 700), and an optional trend line with a small arrow and text such as "+12% عن أمس" (green for positive outcomes, red for negative outcomes, always with an arrow icon and text).
+- Charts must have text alternatives (aria-label summarizing the data) and a "عرض البيانات" toggle revealing the values in a simple table.
+- Use only brand colors for series (dark teal, orange, a mid-teal tint, and a neutral gray), never red and green as decorative series colors.
+- Average examination time and waiting time are shown with units in Arabic ("دقيقة") and the word "تقريبًا" where they are estimates.
+
+## 34. DEVELOPER-FACING UI QUALITY TOOLS
+
+- Create a hidden internal route /dev/ui (available in development builds and in demo mode via a footer link) that renders a living style guide: color tokens, typography scale, spacing scale, icons, every component in every state, StatusBadge mapping, empty/loading/error states, ClinicLocationCard variants, and a sample table. Use it to visually verify consistency, RTL behavior, and responsive behavior of all components in one place.
+- Provide a lightweight layout debug toggle (grid overlay and 8px baseline) available only in development.
+- Add a CSS reset and global base styles in one place (box-sizing, font smoothing, focus-visible, reduced motion, print rules).
+- Prefer CSS logical properties everywhere (margin-inline, padding-inline, inset-inline, border-start/end, text-align: start). Physical left/right properties are not allowed except where absolutely required, with a comment explaining why.
+- Keep components small and composable; page files only compose layout, data hooks, and components, with no business logic.
+
+## 35. VISUAL QA CHECKLIST (MUST PASS BEFORE DELIVERY)
+
+Review every page at 360px, 768px, 1024px, and 1440px, in RTL, and confirm:
+
+1. Spacing uses only tokens; all alignments are consistent on the 4px/8px grid.
+2. Exactly one primary action per view; primary actions are in their defined positions.
+3. All icons are the correct size and stroke; directional icons are mirrored and non-directional ones are not.
+4. Every list and data view has loading, empty, error, and populated states.
+5. No horizontal scroll, no clipped text, no overlapping elements, no layout shift.
+6. All text meets WCAG AA contrast; the orange contrast rule is respected.
+7. Status is never communicated by color alone.
+8. Tab order follows visual order in RTL; focus rings are visible everywhere; modals trap and restore focus.
+9. Long Arabic names, long addresses, many medicines, and large queues render correctly.
+10. Numbers, dates, currency, and plurals use the shared formatting utilities with correct Arabic output.
+11. Sticky and fixed elements never cover content; bottom bars respect safe-area insets.
+12. Print output of the prescription is clean and includes the demo disclaimer.
+13. The demo banner is visible and correct on every page; private-note areas clearly show their privacy label.
+14. The /dev/ui style guide matches what is used in the real pages (no one-off styles).
+
+Fix every issue found before considering the work complete, and summarize remaining known limitations honestly in the README.
+
+## 36. FINAL DELIVERY
+
+Generate a complete Vite + React + TypeScript web project.
+
+Provide:
+
+- All source files.
+- TypeScript configuration.
+- Vite configuration.
+- Required dependencies (package.json).
+- Routing implementation with role guards.
+- Demo datasets.
+- Local storage services.
+- Reusable components.
+- All role-specific pages.
+- A working onboarding flow.
+- A README with instructions for running and deploying the site.
+
+The project must be ready to run with:
+
+npm install
+npm run dev
+
+And ready to deploy as a static site with:
+
+npm run build
+npm run preview
+
+Include deployment notes for static hosts (Vercel, Netlify, GitHub Pages, or Cloudflare Pages), including the SPA fallback configuration.
+
+Do not generate a React Native or Expo project.
+Do not generate a Kotlin/Swift native app.
+Do not replace the web app with a single static HTML page.
+
+The final result must be a real, responsive, RTL Arabic web application.
+
+## FINAL PRODUCT VISION
+
+Create an elegant, reliable, lightweight healthcare website.
+
+It must be simple enough for a patient to understand without technical knowledge, powerful enough for doctors to manage their patients and medical records, and practical enough for nurses to operate daily clinic queues from a reception desk.
+
+Prioritize simplicity, usability, reliability, and professional visual quality.
+
+Build the complete working project, not merely a design or prototype description.
