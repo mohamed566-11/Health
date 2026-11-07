@@ -651,11 +651,11 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
         </div>
       )}
 
-      {/* 2. Interactive 5-Chapter Stepper Bar */}
+      {/* 2. Interactive 5-Chapter Stepper Bar (Desktop/Tablet: Full 5 tabs | Mobile: Sleek 20px progress ticker) */}
       <div
         role="tablist"
         aria-label="فصول الفيديو التوضيحي الخمسة"
-        className="max-md:flex max-md:flex-nowrap max-md:overflow-x-auto max-md:no-scrollbar grid grid-cols-2 sm:grid-cols-5 border-b border-[var(--color-white)]/15 bg-[#08343C]"
+        className="max-md:hidden grid grid-cols-2 sm:grid-cols-5 border-b border-[var(--color-white)]/15 bg-[#08343C]"
       >
         {EXPLAINER_SCENES.map((scene, idx) => {
           const isActive = sceneIndex === idx;
@@ -667,7 +667,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
               role="tab"
               aria-selected={isActive}
               onClick={() => handleSelectScene(idx)}
-              className={`relative px-3.5 py-3 max-md:px-2.5 max-md:py-1.5 max-md:min-w-[110px] max-md:shrink-0 text-start transition-colors cursor-pointer flex flex-col justify-between gap-1 border-e border-[var(--color-white)]/10 last:border-e-0 ${
+              className={`relative px-3.5 py-3 text-start transition-colors cursor-pointer flex flex-col justify-between gap-1 border-e border-[var(--color-white)]/10 last:border-e-0 ${
                 isActive
                   ? 'bg-[#0D4D58] text-[var(--color-white)]'
                   : isCompleted
@@ -676,13 +676,13 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
               }`}
             >
               <div className="flex items-center justify-between gap-1 w-full">
-                <span className="text-[12px] sm:text-[13px] max-md:text-[11px] font-bold truncate">
+                <span className="text-[12px] sm:text-[13px] font-bold truncate">
                   {scene.shortLabel}
                 </span>
                 {isCompleted ? (
-                  <CheckCircle2 className="w-4 h-4 max-md:w-3.5 max-md:h-3.5 text-[var(--color-green)] shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[var(--color-green)] shrink-0" />
                 ) : (
-                  <span className="text-[11px] max-md:text-[10px] tabular-nums opacity-75 shrink-0">
+                  <span className="text-[11px] tabular-nums opacity-75 shrink-0">
                     {formatTimecode(scene.startSec)}
                   </span>
                 )}
@@ -706,21 +706,43 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
         })}
       </div>
 
+      {/* Mobile-only compact chapter progress ticker (< 768px, ~20px height) */}
+      <div className="md:hidden flex items-center justify-between px-2.5 py-1 bg-[#06262D] border-b border-[var(--color-white)]/15 text-[11px] font-bold text-[var(--color-white)]/90 shrink-0">
+        <span className="truncate">الفصل {sceneIndex + 1}/5: {currentScene.shortLabel}</span>
+        <div className="flex items-center gap-1 shrink-0">
+          {EXPLAINER_SCENES.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => handleSelectScene(i)}
+              aria-label={`الانتقال للفصل ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                i === sceneIndex
+                  ? 'w-4 bg-[var(--color-neon-orange)]'
+                  : i < sceneIndex
+                  ? 'w-1.5 bg-[var(--color-green)]'
+                  : 'w-1.5 bg-[var(--color-white)]/25'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
       {/* 3. Main Cinema Split Stage: High-Clarity App Screen Simulation + Synchronized Step Guide */}
-      <div className="relative p-4 sm:p-6 max-md:p-2 bg-gradient-to-b from-[#08353E] to-[#052329]">
+      <div className="relative p-3 sm:p-6 max-md:p-1.5 max-md:flex-1 max-md:flex max-md:flex-col max-md:justify-between bg-gradient-to-b from-[#08353E] to-[#052329] overflow-hidden">
         {/* Scene Top Status Ribbon */}
-        <div className="flex flex-wrap items-center justify-between gap-3 max-md:gap-1.5 mb-4 max-md:mb-2 pb-3 max-md:pb-1.5 border-b border-[var(--color-white)]/15">
-          <div className="flex items-center gap-2.5 max-md:gap-1.5 min-w-0">
-            <span className="px-2.5 py-1 max-md:px-2 max-md:py-0.5 rounded-[var(--radius-sm)] bg-[var(--color-neon-orange)] text-[var(--color-white)] text-[12px] max-md:text-[11px] font-bold tabular-nums shrink-0">
-              الفصل {sceneIndex + 1} من {EXPLAINER_SCENES.length}
+        <div className="flex items-center justify-between gap-2 mb-2 max-md:mb-1 pb-2 max-md:pb-1 border-b border-[var(--color-white)]/15 shrink-0">
+          <div className="flex items-center gap-2 max-md:gap-1.5 min-w-0">
+            <span className="px-2 max-md:px-1.5 py-0.5 rounded-[var(--radius-sm)] bg-[var(--color-neon-orange)] text-[var(--color-white)] text-[11px] max-md:text-[10px] font-bold tabular-nums shrink-0">
+              الفصل {sceneIndex + 1}/5
             </span>
-            <h3 className="text-[16px] sm:text-[19px] max-md:text-[13.5px] font-bold text-[var(--color-white)] truncate">
+            <h3 className="text-[14px] sm:text-[19px] max-md:text-[12px] font-bold text-[var(--color-white)] truncate">
               {currentScene.title}
             </h3>
           </div>
 
-          {/* Live Voice Equalizer Indicator + Quick Play Toggle */}
-          <div className="flex items-center gap-2 max-md:gap-1.5 bg-[#041E24] px-3 py-1.5 max-md:px-2 max-md:py-1 rounded-[var(--radius-sm)] border border-[var(--color-white)]/15 shrink-0">
+          {/* Desktop/Tablet Live Voice Equalizer Indicator */}
+          <div className="hidden sm:flex items-center gap-2 bg-[#041E24] px-3 py-1.5 rounded-[var(--radius-sm)] border border-[var(--color-white)]/15 shrink-0">
             <button
               type="button"
               onClick={handleTogglePlay}
@@ -767,7 +789,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
                 );
               })}
             </div>
-            <span className="text-[12px] max-md:text-[11px] font-bold text-[var(--color-white)]">
+            <span className="text-[12px] font-bold text-[var(--color-white)]">
               {isPlaying && !isMuted
                 ? `يتحدث الآن: ${activeVoiceProfile.nameAr}`
                 : isMuted
@@ -775,10 +797,16 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
                 : `جاهز: ${activeVoiceProfile.nameAr}`}
             </span>
           </div>
+
+          {/* Mobile-only compact voice indicator */}
+          <div className="sm:hidden flex items-center gap-1 text-[10px] font-bold text-[var(--color-neon-orange)] shrink-0">
+            <Volume2 className="w-3 h-3" />
+            <span>{activeVoiceProfile.nameAr}</span>
+          </div>
         </div>
 
         {/* Split Grid: 4 Columns Step-by-Step Breakdown | 8 Columns High-Contrast App Screen */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch max-md:gap-2">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch max-md:gap-0 max-md:flex-1">
           {/* Right Column (4 cols in RTL): 3 Synchronized Micro-Steps (Hidden on phones so stage + subtitles + controls fit viewport) */}
           <div className="lg:col-span-5 max-lg:order-2 max-md:hidden flex flex-col justify-between gap-3 bg-[#041E24]/90 rounded-[var(--radius-md)] p-4 border border-[var(--color-white)]/15">
             <div className="space-y-2.5">
@@ -842,81 +870,76 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
           </div>
 
           {/* Left Column (7 cols in RTL): Ultra-Clear Simulated App Browser Frame */}
-          <div className="lg:col-span-7 max-lg:order-1 flex flex-col rounded-[var(--radius-md)] bg-[var(--color-white)] text-[var(--color-primary-text)] border-2 border-[var(--color-white)]/30 shadow-[var(--shadow-lg)] overflow-hidden">
-            {/* Phone-only compact micro-step indicator */}
-            <div className="md:hidden flex items-center justify-between text-[11px] font-bold text-[var(--color-white)]/90 bg-[#041E24] px-2.5 py-1.5 border-b border-[var(--color-white)]/15">
-              <span className="truncate">الخطوة {activeMicroStepIndex + 1}/3: {currentScene.microSteps[activeMicroStepIndex].title}</span>
-              <span className="text-[var(--color-neon-orange)] text-[10px] shrink-0">✓ متزامن</span>
-            </div>
+          <div className="lg:col-span-7 max-lg:order-1 flex flex-col rounded-[var(--radius-md)] bg-[var(--color-white)] text-[var(--color-primary-text)] border-2 border-[var(--color-white)]/30 shadow-[var(--shadow-lg)] overflow-hidden max-md:border max-md:shadow-none">
             {/* Simulated Browser Top Bar */}
-            <div className="px-3.5 py-2 max-md:py-1 max-md:px-2 bg-[#EEF5F6] border-b border-[var(--color-border)] flex items-center justify-between gap-2">
+            <div className="px-3.5 py-2 max-md:py-1 max-md:px-2 bg-[#EEF5F6] border-b border-[var(--color-border)] flex items-center justify-between gap-2 shrink-0">
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#D94848]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#23845C]" />
-                <span className="ms-2 text-[12px] font-bold text-[var(--color-dark-teal)]">
+                <span className="w-2.5 h-2.5 max-md:w-2 max-md:h-2 rounded-full bg-[#D94848]" />
+                <span className="w-2.5 h-2.5 max-md:w-2 max-md:h-2 rounded-full bg-[#F59E0B]" />
+                <span className="w-2.5 h-2.5 max-md:w-2 max-md:h-2 rounded-full bg-[#23845C]" />
+                <span className="ms-2 max-md:ms-1 text-[12px] max-md:text-[10px] font-bold text-[var(--color-dark-teal)]">
                   شاشة تطبيق موعدي الحية
                 </span>
               </div>
               <div
                 dir="ltr"
-                className="px-2.5 py-0.5 rounded bg-[var(--color-white)] border border-[var(--color-border)] text-[11px] font-semibold text-[var(--color-secondary-text)] truncate max-w-[230px]"
+                className="px-2.5 py-0.5 rounded bg-[var(--color-white)] border border-[var(--color-border)] text-[11px] max-md:text-[9px] font-semibold text-[var(--color-secondary-text)] truncate max-w-[230px] max-md:max-w-[140px]"
               >
                 https://{currentScene.simulatedUrl}
               </div>
             </div>
 
             {/* High-Clarity Scene Canvas (Crisp Light UI for 100% Readability) */}
-            <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between bg-[#F8FBFB] space-y-4">
+            <div className="p-4 sm:p-5 max-md:p-2 flex-1 flex flex-col justify-between bg-[#F8FBFB] space-y-3 max-md:space-y-1.5 overflow-hidden">
               {/* SCENE 0: Fast Login & Medical Safety Alert */}
               {sceneIndex === 0 && (
-                <div className="space-y-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--color-border)]">
-                    <div className="flex items-center gap-2">
-                      <UserCheck className="w-5 h-5 text-[var(--color-dark-teal)]" />
-                      <span className="text-[15px] font-bold text-[var(--color-dark-teal)]">
+                <div className="space-y-3 max-md:space-y-1.5">
+                  <div className="flex flex-wrap items-center justify-between gap-1 pb-1.5 max-md:pb-1 border-b border-[var(--color-border)]">
+                    <div className="flex items-center gap-1.5">
+                      <UserCheck className="w-4 h-4 max-md:w-3.5 max-md:h-3.5 text-[var(--color-dark-teal)]" />
+                      <span className="text-[14px] max-md:text-[11px] font-bold text-[var(--color-dark-teal)]">
                         تسجيل دخول المريض وملف الأمان الطبي
                       </span>
                     </div>
-                    <span className="px-2.5 py-0.5 rounded bg-[var(--color-light-teal)] text-[var(--color-dark-teal)] text-[12px] font-bold">
+                    <span className="px-2 max-md:px-1.5 py-0.5 rounded bg-[var(--color-light-teal)] text-[var(--color-dark-teal)] text-[11px] max-md:text-[9.5px] font-bold">
                       {activeMicroStepIndex === 0
-                        ? '١. إدخال رقم الموبايل'
+                        ? '١. رقم الموبايل'
                         : activeMicroStepIndex === 1
-                        ? '٢. تأكيد كود الـ SMS'
-                        : '٣. تفعيل تنبيه الحساسية للدكتور'}
+                        ? '٢. كود الـ SMS'
+                        : '٣. تنبيه الحساسية'}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3.5 max-md:grid-cols-2">
                     {/* Phone & OTP Card */}
                     <div
-                      className={`p-3.5 rounded-[var(--radius-md)] bg-[var(--color-white)] border-2 transition-all space-y-3 ${
+                      className={`p-3 max-md:p-1.5 rounded-[var(--radius-md)] bg-[var(--color-white)] border-2 transition-all space-y-2.5 max-md:space-y-1 ${
                         activeMicroStepIndex <= 1
                           ? 'border-[var(--color-neon-orange)] shadow-sm'
                           : 'border-[var(--color-border)]'
                       }`}
                     >
                       <div>
-                        <div className="text-[12px] font-bold text-[var(--color-secondary-text)] mb-1">
+                        <div className="text-[11px] max-md:text-[9.5px] font-bold text-[var(--color-secondary-text)] mb-0.5">
                           ١. رقم الموبايل المصري:
                         </div>
                         <div
                           dir="ltr"
-                          className="h-10 px-3 rounded-[var(--radius-sm)] bg-[#F2F7F8] border border-[var(--color-dark-teal)] flex items-center justify-between font-bold tabular-nums text-[15px] text-[var(--color-dark-teal)]"
+                          className="h-9 max-md:h-6 px-2.5 max-md:px-1.5 rounded-[var(--radius-sm)] bg-[#F2F7F8] border border-[var(--color-dark-teal)] flex items-center justify-between font-bold tabular-nums text-[13px] max-md:text-[10px] text-[var(--color-dark-teal)]"
                         >
                           <span>+20 101 234 5678</span>
-                          <CheckCircle2 className="w-4 h-4 text-[var(--color-green)]" />
+                          <CheckCircle2 className="w-3.5 h-3.5 max-md:w-3 max-md:h-3 text-[var(--color-green)]" />
                         </div>
                       </div>
 
                       <div>
-                        <div className="flex items-center justify-between text-[12px] font-bold text-[var(--color-secondary-text)] mb-1">
-                          <span>٢. كود التأكيد السريع (OTP):</span>
-                          <span className="text-[11px] text-[var(--color-green)]">
-                            تم الإرسال في ثانية ✓
+                        <div className="flex items-center justify-between text-[11px] max-md:text-[9.5px] font-bold text-[var(--color-secondary-text)] mb-0.5">
+                          <span>٢. كود التأكيد (OTP):</span>
+                          <span className="text-[10px] max-md:text-[8.5px] text-[var(--color-green)]">
+                            في ثانية ✓
                           </span>
                         </div>
-                        <div dir="ltr" className="grid grid-cols-4 gap-2">
+                        <div dir="ltr" className="grid grid-cols-4 gap-1.5 max-md:gap-1">
                           {['4', '8', '2', '9'].map((digit, dIdx) => {
                             const filled =
                               activeMicroStepIndex >= 1 ||
@@ -924,7 +947,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
                             return (
                               <div
                                 key={dIdx}
-                                className={`h-10 rounded-[var(--radius-sm)] border-2 flex items-center justify-center font-bold tabular-nums text-[16px] transition-all ${
+                                className={`h-8 max-md:h-6 rounded-[var(--radius-sm)] border-2 flex items-center justify-center font-bold tabular-nums text-[14px] max-md:text-[11px] transition-all ${
                                   filled
                                     ? 'bg-[var(--color-dark-teal)] text-[var(--color-white)] border-[var(--color-dark-teal)]'
                                     : 'bg-[var(--color-white)] text-[var(--color-secondary-text)] border-[var(--color-border)]'
@@ -940,34 +963,30 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
 
                     {/* Medical Alert Banner Preview */}
                     <div
-                      className={`p-3.5 rounded-[var(--radius-md)] border-2 transition-all flex flex-col justify-between space-y-2.5 ${
+                      className={`p-3 max-md:p-1.5 rounded-[var(--radius-md)] border-2 transition-all flex flex-col justify-between space-y-2 max-md:space-y-1 ${
                         activeMicroStepIndex === 2
                           ? 'bg-[#FDF2F2] border-[#D94848] ring-2 ring-[#D94848]/30 shadow-sm'
                           : 'bg-[var(--color-white)] border-[var(--color-border)]'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[#D94848]">
-                          <ShieldCheck className="w-4 h-4" />
-                          <span>٣. بطاقة تنبيه الدكتور الفورية</span>
+                        <span className="inline-flex items-center gap-1 text-[12px] max-md:text-[10px] font-bold text-[#D94848]">
+                          <ShieldCheck className="w-3.5 h-3.5 max-md:w-3 max-md:h-3" />
+                          <span>٣. بطاقة تنبيه الدكتور</span>
                         </span>
-                        <span className="px-2 py-0.5 rounded bg-[#D94848] text-[var(--color-white)] text-[11px] font-bold">
-                          هام جداً لسلامتك
+                        <span className="px-1.5 py-0.5 rounded bg-[#D94848] text-[var(--color-white)] text-[10px] max-md:text-[8.5px] font-bold">
+                          هام
                         </span>
                       </div>
 
-                      <p className="text-[12px] text-[var(--color-primary-text)] leading-relaxed">
-                        أول ما الدكتور يفتح ملفك في العيادة، بيظهرله تحذير واضح بأي حساسية دوائية أو أمراض مزمنة سجلتها:
-                      </p>
-
-                      <div className="space-y-1.5 pt-1">
-                        <div className="px-2.5 py-1.5 rounded bg-[var(--color-white)] border border-[#D94848]/40 text-[12px] font-bold text-[#D94848] flex items-center justify-between">
-                          <span>⚠️ حساسية مسجلة: البنسلين (Penicillin)</span>
-                          <span>مفعل ✓</span>
+                      <div className="space-y-1 pt-0.5">
+                        <div className="px-2 max-md:px-1.5 py-1 max-md:py-0.5 rounded bg-[var(--color-white)] border border-[#D94848]/40 text-[11px] max-md:text-[9.5px] font-bold text-[#D94848] flex items-center justify-between">
+                          <span className="truncate">⚠️ البنسلين (Penicillin)</span>
+                          <span className="text-[8.5px] shrink-0">مفعل ✓</span>
                         </div>
-                        <div className="px-2.5 py-1.5 rounded bg-[var(--color-light-teal)] text-[12px] font-bold text-[var(--color-dark-teal)] flex items-center justify-between">
-                          <span>🩺 أمراض مزمنة: ضغط الدم المرتفع</span>
-                          <span>مفعل ✓</span>
+                        <div className="px-2 max-md:px-1.5 py-1 max-md:py-0.5 rounded bg-[var(--color-light-teal)] text-[11px] max-md:text-[9.5px] font-bold text-[var(--color-dark-teal)] flex items-center justify-between">
+                          <span className="truncate">🩺 ضغط الدم المرتفع</span>
+                          <span className="text-[8.5px] shrink-0">مفعل ✓</span>
                         </div>
                       </div>
                     </div>
@@ -977,38 +996,38 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
 
               {/* SCENE 1: Search, Filter & Compare 24 Doctors */}
               {sceneIndex === 1 && (
-                <div className="space-y-3.5">
+                <div className="space-y-2.5 max-md:space-y-1.5">
                   {/* Simulated Filter Bar */}
                   <div
-                    className={`p-3 rounded-[var(--radius-md)] bg-[var(--color-white)] border-2 transition-all grid grid-cols-1 sm:grid-cols-3 gap-2 ${
+                    className={`p-2.5 max-md:p-1.5 rounded-[var(--radius-md)] bg-[var(--color-white)] border-2 transition-all grid grid-cols-1 sm:grid-cols-3 gap-1.5 ${
                       activeMicroStepIndex === 0
                         ? 'border-[var(--color-neon-orange)]'
                         : 'border-[var(--color-border)]'
                     }`}
                   >
-                    <div className="px-2.5 py-1.5 rounded bg-[var(--color-light-teal)] text-[12px] font-bold text-[var(--color-dark-teal)] flex items-center justify-between">
-                      <span>التخصص: قلب وأوعية دموية</span>
-                      <Stethoscope className="w-3.5 h-3.5" />
+                    <div className="px-2 py-1 max-md:py-0.5 rounded bg-[var(--color-light-teal)] text-[11px] max-md:text-[9.5px] font-bold text-[var(--color-dark-teal)] flex items-center justify-between">
+                      <span>قلب وأوعية دموية</span>
+                      <Stethoscope className="w-3 h-3" />
                     </div>
-                    <div className="px-2.5 py-1.5 rounded bg-[var(--color-light-teal)] text-[12px] font-bold text-[var(--color-dark-teal)] flex items-center justify-between">
-                      <span>المحافظة: القاهرة</span>
-                      <MapPin className="w-3.5 h-3.5" />
+                    <div className="px-2 py-1 max-md:py-0.5 rounded bg-[var(--color-light-teal)] text-[11px] max-md:text-[9.5px] font-bold text-[var(--color-dark-teal)] flex items-center justify-between">
+                      <span>القاهرة</span>
+                      <MapPin className="w-3 h-3" />
                     </div>
-                    <div className="px-2.5 py-1.5 rounded bg-[var(--color-dark-teal)] text-[12px] font-bold text-[var(--color-white)] flex items-center justify-center gap-1.5">
-                      <Search className="w-3.5 h-3.5" />
-                      <span>٢٤ دكتور معتمد متاح</span>
+                    <div className="px-2 py-1 max-md:py-0.5 rounded bg-[var(--color-dark-teal)] text-[11px] max-md:text-[9.5px] font-bold text-[var(--color-white)] flex items-center justify-center gap-1">
+                      <Search className="w-3 h-3" />
+                      <span>٢٤ دكتور متاح</span>
                     </div>
                   </div>
 
                   {/* Doctor Comparison Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                     {[
                       {
                         name: 'د. أحمد محمود',
                         title: 'استشاري أمراض القلب والقسطرة',
-                        loc: 'القاهرة — مدينة نصر (دار القلب)',
+                        loc: 'مدينة نصر (دار القلب)',
                         rating: '4.9',
-                        reviews: '320 تقييم حقيقي',
+                        reviews: '320 تقييم',
                         exp: '18 سنة خبرة',
                         examFee: '350 ج.م',
                         consultFee: '150 ج.م',
@@ -1016,10 +1035,10 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
                       },
                       {
                         name: 'د. مريم عبد اللطيف',
-                        title: 'استشاري النساء والتوليد والحقن المجهري',
-                        loc: 'القاهرة — مصر الجديدة (الميرغني)',
+                        title: 'استشاري النساء والتوليد',
+                        loc: 'مصر الجديدة',
                         rating: '4.9',
-                        reviews: '410 تقييم حقيقي',
+                        reviews: '410 تقييم',
                         exp: '16 سنة خبرة',
                         examFee: '400 ج.م',
                         consultFee: '180 ج.م',
@@ -1028,49 +1047,48 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
                     ].map((doc, idx) => (
                       <div
                         key={idx}
-                        className={`p-3.5 rounded-[var(--radius-md)] bg-[var(--color-white)] border-2 transition-all flex flex-col justify-between space-y-2.5 ${
+                        className={`p-3 max-md:p-1.5 rounded-[var(--radius-md)] bg-[var(--color-white)] border-2 transition-all flex flex-col justify-between space-y-2 max-md:space-y-1 ${
                           doc.selected
-                            ? 'border-[var(--color-neon-orange)] shadow-md ring-2 ring-[var(--color-neon-orange)]/20'
+                            ? 'border-[var(--color-neon-orange)] shadow-md ring-1 ring-[var(--color-neon-orange)]/20'
+                            : idx > 0
+                            ? 'border-[var(--color-border)] opacity-90 max-md:hidden'
                             : 'border-[var(--color-border)] opacity-90'
                         }`}
                       >
                         <div>
                           <div className="flex items-center justify-between gap-1">
-                            <span className="font-bold text-[15px] text-[var(--color-dark-teal)]">
+                            <span className="font-bold text-[14px] max-md:text-[11px] text-[var(--color-dark-teal)]">
                               {doc.name}
                             </span>
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#FFF4E5] text-[#B45309] text-[12px] font-bold tabular-nums">
-                              <Star className="w-3.5 h-3.5 fill-current" />
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#FFF4E5] text-[#B45309] text-[11px] max-md:text-[9.5px] font-bold tabular-nums">
+                              <Star className="w-3 h-3 fill-current" />
                               {doc.rating}
                             </span>
                           </div>
-                          <div className="text-[12px] font-semibold text-[var(--color-secondary-text)] mt-0.5">
+                          <div className="text-[11px] max-md:text-[9.5px] font-semibold text-[var(--color-secondary-text)]">
                             {doc.title}
                           </div>
-                          <div className="text-[11px] text-[var(--color-secondary-text)] mt-1 flex items-center gap-2">
+                          <div className="text-[10px] max-md:text-[9px] text-[var(--color-secondary-text)] flex items-center gap-1.5">
                             <span>📍 {doc.loc}</span>
                             <span>· {doc.exp}</span>
                           </div>
                         </div>
 
-                        <div className="pt-2 border-t border-[var(--color-border)] flex items-center justify-between text-[12px]">
+                        <div className="pt-1.5 max-md:pt-1 border-t border-[var(--color-border)] flex items-center justify-between text-[11px] max-md:text-[9.5px]">
                           <div>
                             <span className="text-[var(--color-secondary-text)]">الكشف: </span>
-                            <strong className="text-[var(--color-dark-teal)] text-[14px]">
+                            <strong className="text-[var(--color-dark-teal)] text-[12px] max-md:text-[10.5px]">
                               {doc.examFee}
                             </strong>
-                            <span className="text-[11px] text-[var(--color-secondary-text)] ms-1">
-                              (الاستشارة {doc.consultFee})
-                            </span>
                           </div>
                           <span
-                            className={`px-2.5 py-1 rounded font-bold text-[12px] inline-flex items-center gap-1 ${
+                            className={`px-2 py-0.5 rounded font-bold text-[11px] max-md:text-[9.5px] inline-flex items-center gap-1 ${
                               doc.selected
                                 ? 'bg-[var(--color-neon-orange)] text-[var(--color-white)]'
                                 : 'bg-[var(--color-light-teal)] text-[var(--color-dark-teal)]'
                             }`}
                           >
-                            <MousePointerClick className="w-3.5 h-3.5" />
+                            <MousePointerClick className="w-3 h-3" />
                             <span>احجز الآن</span>
                           </span>
                         </div>
@@ -1082,85 +1100,73 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
 
               {/* SCENE 2: 3-Step Booking & Instant Queue Number #025 */}
               {sceneIndex === 2 && (
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-stretch">
-                  <div className="sm:col-span-7 p-3.5 rounded-[var(--radius-md)] bg-[var(--color-white)] border border-[var(--color-border)] space-y-3">
-                    <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-2">
-                      <span className="font-bold text-[14px] text-[var(--color-dark-teal)]">
-                        خطوات تأكيد الحجز السريع (د. أحمد محمود)
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-3.5 items-stretch max-md:grid-cols-2">
+                  <div className="sm:col-span-7 p-3 max-md:p-1.5 rounded-[var(--radius-md)] bg-[var(--color-white)] border border-[var(--color-border)] space-y-2 max-md:space-y-1">
+                    <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-1">
+                      <span className="font-bold text-[13px] max-md:text-[10.5px] text-[var(--color-dark-teal)] truncate">
+                        تأكيد الحجز (د. أحمد محمود)
                       </span>
-                      <span className="text-[11px] font-bold text-[var(--color-green)]">
-                        الدفع كاش بالعيادة ✓
+                      <span className="text-[10px] font-bold text-[var(--color-green)] shrink-0">
+                        كاش بالعيادة ✓
                       </span>
                     </div>
 
                     {/* Step 1: Branch */}
                     <div
-                      className={`p-2.5 rounded border text-[12px] flex items-center justify-between ${
+                      className={`p-2 max-md:p-1 rounded border text-[11px] max-md:text-[9.5px] flex items-center justify-between ${
                         activeMicroStepIndex === 0
                           ? 'border-[var(--color-neon-orange)] bg-[#FFF8F6]'
                           : 'border-[var(--color-border)] bg-[#F8FBFB]'
                       }`}
                     >
-                      <div>
-                        <span className="font-bold text-[var(--color-dark-teal)]">
-                          ١. فرع العيادة:
-                        </span>{' '}
-                        <span>عيادة دار القلب التخصصية — مدينة نصر</span>
-                      </div>
-                      <CheckCircle2 className="w-4 h-4 text-[var(--color-green)] shrink-0" />
+                      <span className="truncate">عيادة دار القلب — مدينة نصر</span>
+                      <CheckCircle2 className="w-3.5 h-3.5 max-md:w-3 max-md:h-3 text-[var(--color-green)] shrink-0" />
                     </div>
 
                     {/* Step 2: Day & Shift */}
                     <div
-                      className={`p-2.5 rounded border text-[12px] space-y-1.5 ${
+                      className={`p-2 max-md:p-1 rounded border text-[11px] max-md:text-[9.5px] space-y-1 max-md:space-y-0.5 ${
                         activeMicroStepIndex === 1
                           ? 'border-[var(--color-neon-orange)] bg-[#FFF8F6]'
                           : 'border-[var(--color-border)] bg-[#F8FBFB]'
                       }`}
                     >
                       <div className="font-bold text-[var(--color-dark-teal)]">
-                        ٢. اختار اليوم والفترة المناسبة لوقتك:
+                        اليوم والموعد المناسب:
                       </div>
-                      <div className="grid grid-cols-3 gap-1.5 text-center">
-                        <div className="py-1 px-1.5 rounded bg-[var(--color-white)] border border-[var(--color-border)] text-[11px]">
-                          الخميس · صباحاً
+                      <div className="grid grid-cols-3 gap-1 text-center">
+                        <div className="py-0.5 px-1 rounded bg-[var(--color-white)] border border-[var(--color-border)] text-[9.5px] truncate">
+                          الخميس
                         </div>
-                        <div className="py-1 px-1.5 rounded bg-[var(--color-dark-teal)] text-[var(--color-white)] font-bold text-[11px]">
-                          اليوم · 06:30 م ✓
+                        <div className="py-0.5 px-1 rounded bg-[var(--color-dark-teal)] text-[var(--color-white)] font-bold text-[9.5px] truncate">
+                          اليوم 06:30 م ✓
                         </div>
-                        <div className="py-1 px-1.5 rounded bg-[var(--color-white)] border border-[var(--color-border)] text-[11px]">
-                          السبت · مساءً
+                        <div className="py-0.5 px-1 rounded bg-[var(--color-white)] border border-[var(--color-border)] text-[9.5px] truncate">
+                          السبت
                         </div>
                       </div>
-                    </div>
-
-                    <div className="text-[11px] font-semibold text-[var(--color-secondary-text)] flex items-center justify-between pt-0.5">
-                      <span>💳 مش محتاج فيزا — الدفع نقداً عند الوصول</span>
-                      <span className="text-[var(--color-green)] font-bold">
-                        بدون مصاريف إضافية
-                      </span>
                     </div>
                   </div>
 
                   {/* Step 3: Issued Queue Ticket #025 */}
                   <div
-                    className={`sm:col-span-5 p-4 rounded-[var(--radius-md)] bg-[var(--color-dark-teal)] text-[var(--color-white)] flex flex-col items-center justify-center text-center space-y-2 border-2 transition-all ${
+                    className={`sm:col-span-5 p-3 max-md:p-1.5 rounded-[var(--radius-md)] bg-[var(--color-dark-teal)] text-[var(--color-white)] flex flex-col items-center justify-center text-center space-y-1 border-2 transition-all ${
                       activeMicroStepIndex === 2
                         ? 'border-[var(--color-neon-orange)] scale-[1.01] shadow-md'
                         : 'border-[var(--color-dark-teal)]'
                     }`}
                   >
-                    <span className="px-2.5 py-0.5 rounded-full bg-[var(--color-green)] text-[var(--color-white)] text-[11px] font-bold">
-                      ✓ تم تأكيد حجزك فوراً
+                    <span className="px-2 py-0.5 rounded-full bg-[var(--color-green)] text-[var(--color-white)] text-[10px] max-md:text-[9px] font-bold">
+                      ✓ تم التأكيد فوراً
                     </span>
-                    <div className="text-[12px] text-[var(--color-white)]/85">
-                      رقم دورك الرسمي في طابور العيادة:
+                    <div className="text-[11px] max-md:text-[9.5px] text-[var(--color-white)]/85">
+                      رقم دورك الرسمي:
                     </div>
-                    <div className="text-[38px] font-bold tabular-nums text-[var(--color-neon-orange)] leading-none py-1">
+                    <div className="text-[32px] max-md:text-[22px] font-bold tabular-nums text-[var(--color-neon-orange)] leading-none py-0.5">
                       #025
                     </div>
-                    <div className="text-[11px] text-[var(--color-white)]/80">
-                      الفترة المسائية · 06:30 م · كشف عادي (350 ج.م)
+                    <div className="text-[10px] max-md:text-[8.5px] text-[var(--color-white)]/80">
+                      06:30 م · كشف عادي (350 ج.م)
                     </div>
                   </div>
                 </div>
@@ -1168,34 +1174,34 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
 
               {/* SCENE 3: Live Queue Tracker from Home */}
               {sceneIndex === 3 && (
-                <div className="space-y-3.5">
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--color-border)]">
-                    <div className="flex items-center gap-2">
-                      <Activity className="w-5 h-5 text-[var(--color-neon-orange)]" />
-                      <span className="font-bold text-[15px] text-[var(--color-dark-teal)]">
-                        شاشة متابعة الطابور اللايف (تتحدث تلقائياً من بيتك)
+                <div className="space-y-2.5 max-md:space-y-1.5">
+                  <div className="flex flex-wrap items-center justify-between gap-1 pb-1.5 max-md:pb-1 border-b border-[var(--color-border)]">
+                    <div className="flex items-center gap-1.5">
+                      <Activity className="w-4 h-4 max-md:w-3.5 max-md:h-3.5 text-[var(--color-neon-orange)]" />
+                      <span className="font-bold text-[14px] max-md:text-[11px] text-[var(--color-dark-teal)]">
+                        متابعة الطابور اللايف تلقائياً
                       </span>
                     </div>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#E8F5E9] text-[var(--color-green)] text-[12px] font-bold">
-                      <span className="w-2 h-2 rounded-full bg-[var(--color-green)]" />
-                      متصل بالعيادة الآن (مباشر)
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E8F5E9] text-[var(--color-green)] text-[11px] max-md:text-[9.5px] font-bold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-green)]" />
+                      متصل مباشر
                     </span>
                   </div>
 
-                  {/* 4 Big Live Queue Counters */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
-                    <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-dark-teal)] text-[var(--color-white)]">
-                      <div className="text-[11px] text-[var(--color-white)]/80">رقم حجزك إنت</div>
-                      <div className="text-[26px] font-bold tabular-nums text-[var(--color-neon-orange)]">
+                  {/* 4 Live Queue Counters */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 max-md:grid-cols-4 gap-1.5 sm:gap-2.5 text-center">
+                    <div className="p-2 max-md:p-1 rounded-[var(--radius-md)] bg-[var(--color-dark-teal)] text-[var(--color-white)]">
+                      <div className="text-[10px] max-md:text-[8.5px] text-[var(--color-white)]/80">رقم دورك</div>
+                      <div className="text-[22px] max-md:text-[15px] font-bold tabular-nums text-[var(--color-neon-orange)]">
                         #025
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-white)] border-2 border-[var(--color-neon-orange)]">
-                      <div className="text-[11px] font-bold text-[var(--color-secondary-text)]">
-                        جوّه الكشف دلوقتي
+                    <div className="p-2 max-md:p-1 rounded-[var(--radius-md)] bg-[var(--color-white)] border-2 border-[var(--color-neon-orange)]">
+                      <div className="text-[10px] max-md:text-[8.5px] font-bold text-[var(--color-secondary-text)]">
+                        داخل الكشف
                       </div>
-                      <div className="text-[26px] font-bold tabular-nums text-[var(--color-dark-teal)]">
+                      <div className="text-[22px] max-md:text-[15px] font-bold tabular-nums text-[var(--color-dark-teal)]">
                         {activeMicroStepIndex === 0
                           ? '#021'
                           : activeMicroStepIndex === 1
@@ -1204,47 +1210,47 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-white)] border border-[var(--color-border)]">
-                      <div className="text-[11px] font-bold text-[var(--color-secondary-text)]">
-                        فاضل كام مريض قبلك؟
+                    <div className="p-2 max-md:p-1 rounded-[var(--radius-md)] bg-[var(--color-white)] border border-[var(--color-border)]">
+                      <div className="text-[10px] max-md:text-[8.5px] font-bold text-[var(--color-secondary-text)]">
+                        مرضى قبلك
                       </div>
-                      <div className="text-[20px] font-bold tabular-nums text-[var(--color-primary-text)] mt-1">
+                      <div className="text-[16px] max-md:text-[13px] font-bold tabular-nums text-[var(--color-primary-text)] mt-0.5">
                         {activeMicroStepIndex === 0
-                          ? '3 مرضى'
+                          ? '3'
                           : activeMicroStepIndex === 1
-                          ? 'مريضين بس'
-                          : 'مريض واحد!'}
+                          ? '2'
+                          : '1'}
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-white)] border border-[var(--color-border)]">
-                      <div className="text-[11px] font-bold text-[var(--color-secondary-text)]">
-                        الوقت المتوقع لدخولك
+                    <div className="p-2 max-md:p-1 rounded-[var(--radius-md)] bg-[var(--color-white)] border border-[var(--color-border)]">
+                      <div className="text-[10px] max-md:text-[8.5px] font-bold text-[var(--color-secondary-text)]">
+                        الوقت المتوقع
                       </div>
-                      <div className="text-[20px] font-bold tabular-nums text-[var(--color-green)] mt-1">
+                      <div className="text-[16px] max-md:text-[13px] font-bold tabular-nums text-[var(--color-green)] mt-0.5">
                         {activeMicroStepIndex === 0
-                          ? '35 دقيقة'
+                          ? '35 د'
                           : activeMicroStepIndex === 1
-                          ? '20 دقيقة'
-                          : '10 دقايق'}
+                          ? '20 د'
+                          : '10 د'}
                       </div>
                     </div>
                   </div>
 
                   {/* Smart Push Alert Banner */}
                   <div
-                    className={`p-3 rounded-[var(--radius-md)] border-2 flex items-center justify-between gap-3 transition-all ${
+                    className={`p-2 max-md:p-1 max-md:px-2 rounded-[var(--radius-md)] border-2 flex items-center justify-between gap-2 transition-all ${
                       activeMicroStepIndex >= 1
                         ? 'bg-[#FFF4E5] border-[var(--color-neon-orange)] text-[var(--color-primary-text)] shadow-xs'
                         : 'bg-[var(--color-light-teal)] border-[var(--color-border)] text-[var(--color-dark-teal)]'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5 text-[12px] sm:text-[13px] font-bold">
-                      <Bell className="w-5 h-5 text-[var(--color-neon-orange)] shrink-0" />
-                      <span>
+                    <div className="flex items-center gap-1.5 text-[11px] max-md:text-[9.5px] font-bold">
+                      <Bell className="w-3.5 h-3.5 text-[var(--color-neon-orange)] shrink-0" />
+                      <span className="truncate">
                         {activeMicroStepIndex >= 1
-                          ? 'تنبيه ذكي من موعدي: دورك قرّب جداً (فاضل قبلك مريضين بس) — تقدر تتحرك للعيادة دلوقتي عشان تدخل على ميعادك بالظبط!'
-                          : 'إنت قاعد مرتاح في بيتك، وأول ما الرقم يقرب من #025 هنبعتلك تنبيه صوتي ورسالة فوراً.'}
+                          ? 'تنبيه ذكي: دورك قرّب جداً (فاضل 2 مرضى) — تحرك للعيادة الآن!'
+                          : 'أول ما الدور يقرب من #025 هنبعتلك تنبيه صوتي ورسالة فوراً.'}
                       </span>
                     </div>
                   </div>
@@ -1253,72 +1259,73 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
 
               {/* SCENE 4: Digital Prescription (PDF) & Permanent Medical History */}
               {sceneIndex === 4 && (
-                <div className="space-y-3.5">
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--color-border)]">
-                    <div className="flex items-center gap-2">
-                      <Pill className="w-5 h-5 text-[var(--color-neon-orange)]" />
-                      <span className="font-bold text-[15px] text-[var(--color-dark-teal)]">
-                        روشتة إلكترونية رسمية واضحة + أرشيفك الطبي الكامل
+                <div className="space-y-2.5 max-md:space-y-1.5">
+                  <div className="flex flex-wrap items-center justify-between gap-1 pb-1.5 max-md:pb-1 border-b border-[var(--color-border)]">
+                    <div className="flex items-center gap-1.5">
+                      <Pill className="w-4 h-4 max-md:w-3.5 max-md:h-3.5 text-[var(--color-neon-orange)]" />
+                      <span className="font-bold text-[14px] max-md:text-[11px] text-[var(--color-dark-teal)]">
+                        روشتة إلكترونية رسمية واضحة
                       </span>
                     </div>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--color-dark-teal)] text-[var(--color-white)] text-[12px] font-bold">
-                      <Download className="w-3.5 h-3.5 text-[var(--color-neon-orange)]" />
-                      <span>جاهزة للطباعة PDF</span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--color-dark-teal)] text-[var(--color-white)] text-[11px] max-md:text-[9px] font-bold">
+                      <Download className="w-3 h-3 text-[var(--color-neon-orange)]" />
+                      <span>PDF</span>
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-white)] border-2 border-[var(--color-dark-teal)]/30 space-y-1.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 max-md:grid-cols-2 max-md:gap-1">
+                    <div className="p-2.5 max-md:p-1 max-md:px-1.5 rounded-[var(--radius-md)] bg-[var(--color-white)] border-2 border-[var(--color-dark-teal)]/30 space-y-1 max-md:space-y-0.5">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-[14px] text-[var(--color-dark-teal)]">
-                          ١. كونكور 5 مجم (Concor 5mg)
+                        <span className="font-bold text-[13px] max-md:text-[10px] text-[var(--color-dark-teal)] truncate">
+                          ١. كونكور 5 مجم (Concor)
                         </span>
-                        <span className="px-2 py-0.5 rounded bg-[var(--color-light-teal)] text-[var(--color-dark-teal)] text-[11px] font-bold">
+                        <span className="px-1.5 py-0.5 rounded bg-[var(--color-light-teal)] text-[var(--color-dark-teal)] text-[10px] max-md:text-[8.5px] font-bold shrink-0">
                           بعد الفطار
                         </span>
                       </div>
-                      <div className="text-[12px] text-[var(--color-secondary-text)]">
-                        الجرعة: قرص واحد يومياً صباحاً بعد الأكل · المدة: 30 يوماً
+                      <div className="text-[11px] max-md:text-[9px] text-[var(--color-secondary-text)] truncate">
+                        قرص واحد يومياً صباحاً · 30 يوماً
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-white)] border-2 border-[var(--color-dark-teal)]/30 space-y-1.5">
+                    <div className="p-2.5 max-md:p-1 max-md:px-1.5 rounded-[var(--radius-md)] bg-[var(--color-white)] border-2 border-[var(--color-dark-teal)]/30 space-y-1 max-md:space-y-0.5">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-[14px] text-[var(--color-dark-teal)]">
-                          ٢. أتور 20 مجم (Ator 20mg)
+                        <span className="font-bold text-[13px] max-md:text-[10px] text-[var(--color-dark-teal)] truncate">
+                          ٢. أتور 20 مجم (Ator)
                         </span>
-                        <span className="px-2 py-0.5 rounded bg-[var(--color-light-teal)] text-[var(--color-dark-teal)] text-[11px] font-bold">
+                        <span className="px-1.5 py-0.5 rounded bg-[var(--color-light-teal)] text-[var(--color-dark-teal)] text-[10px] max-md:text-[8.5px] font-bold shrink-0">
                           بعد العشاء
                         </span>
                       </div>
-                      <div className="text-[12px] text-[var(--color-secondary-text)]">
-                        الجرعة: قرص واحد يومياً مساءً بعد العشاء · المدة: 30 يوماً
+                      <div className="text-[11px] max-md:text-[9px] text-[var(--color-secondary-text)] truncate">
+                        قرص واحد يومياً مساءً · 30 يوماً
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-light-teal)] border border-[var(--color-border)] flex flex-wrap items-center justify-between gap-2 text-[12px]">
-                    <div className="flex items-center gap-2 font-bold text-[var(--color-dark-teal)]">
-                      <FileText className="w-4 h-4 text-[var(--color-neon-orange)]" />
-                      <span>
-                        محفوظة تلقائياً في سجلك الطبي مع التشخيص وموعد الاستشارة القادمة
+                  <div className="p-2.5 max-md:p-1 max-md:px-1.5 rounded-[var(--radius-md)] bg-[var(--color-light-teal)] border border-[var(--color-border)] flex items-center justify-between gap-1 text-[11px] max-md:text-[9.5px]">
+                    <div className="flex items-center gap-1.5 font-bold text-[var(--color-dark-teal)] truncate">
+                      <FileText className="w-3.5 h-3.5 text-[var(--color-neon-orange)] shrink-0" />
+                      <span className="truncate">
+                        محفوظة تلقائياً في سجلك الطبي
                       </span>
                     </div>
-                    <span className="font-bold text-[var(--color-green)]">
-                      ✓ لا تضيع أبداً
+                    <span className="font-bold text-[var(--color-green)] shrink-0">
+                      ✓ لا تضيع
                     </span>
                   </div>
                 </div>
               )}
 
               {/* Bottom Bar inside Simulated App Screen: Direct Interactive CTA */}
-              <div className="pt-2.5 border-t border-[var(--color-border)] flex flex-wrap items-center justify-between gap-2">
-                <span className="text-[12px] font-semibold text-[var(--color-secondary-text)]">
-                  عايز تجرب الخطوة دي بنفسك دلوقتي جوّه التطبيق؟
+              <div className="pt-2 max-md:pt-1 border-t border-[var(--color-border)] flex items-center justify-between gap-1 shrink-0">
+                <span className="text-[12px] max-md:text-[10px] font-semibold text-[var(--color-secondary-text)] truncate">
+                  عايز تجرب الخطوة دي بنفسك؟
                 </span>
                 <Button
                   variant="primary"
                   size="sm"
+                  className="max-md:py-0.5 max-md:px-2 max-md:text-[10px] max-md:min-h-[26px] shrink-0"
                   onClick={() => {
                     setIsPlaying(false);
                     onCloseModal?.();
@@ -1333,15 +1340,15 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
         </div>
 
         {/* 4. Synchronized Word-by-Word Karaoke Egyptian Arabic Subtitle Box */}
-        <div className="mt-4 max-md:mt-2 p-3.5 sm:p-4 max-md:p-2.5 rounded-[var(--radius-md)] bg-[#03181C] border border-[var(--color-white)]/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 max-md:gap-1.5">
-          <div className="space-y-1 flex-1">
-            <div className="flex items-center gap-2 text-[12px] max-md:text-[11px] font-bold text-[var(--color-neon-orange)]">
-              <Volume2 className="w-4 h-4 max-md:w-3.5 max-md:h-3.5 shrink-0" />
+        <div className="mt-2 max-md:mt-1 p-3 sm:p-4 max-md:p-1 max-md:px-2 rounded-[var(--radius-md)] bg-[#03181C] border border-[var(--color-white)]/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 max-md:gap-1 shrink-0">
+          <div className="space-y-0.5 flex-1 min-w-0">
+            <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-bold text-[var(--color-neon-orange)]">
+              <Volume2 className="w-3.5 h-3.5 shrink-0" />
               <span>
-                النص الصوتي المسموع الآن ({activeVoiceProfile.nameAr} — لهجة مصرية طبيعية ١٠٠٪):
+                النص الصوتي ({activeVoiceProfile.nameAr}):
               </span>
             </div>
-            <p className="text-[14px] sm:text-[16px] max-md:text-[13px] leading-[1.6] font-semibold max-lg:max-h-[85px] max-md:max-h-[48px] overflow-y-auto no-scrollbar">
+            <p className="text-[13px] sm:text-[15px] max-md:text-[11px] leading-[1.4] font-semibold max-h-[44px] max-md:max-h-[28px] overflow-y-auto no-scrollbar">
               {narrationWords.map((word, wIdx) => {
                 const isSpoken = wIdx < highlightedWordCount;
                 const isCurrentWord =
@@ -1367,26 +1374,26 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
             </p>
           </div>
 
-          {/* Play / Next / Previous Scene Quick Navigation */}
-          <div className="flex flex-wrap items-center gap-2 max-md:gap-1.5 shrink-0 self-end sm:self-center">
+          {/* Quick Scene Nav */}
+          <div className="flex flex-wrap items-center gap-1.5 shrink-0 self-end sm:self-center">
             {!isPlaying && (
               <button
                 type="button"
                 onClick={handleTogglePlay}
                 aria-label="تشغيل الفيديو التوضيحي بالصوت المصري الطبيعي"
-                className="px-3.5 py-2 max-md:px-2.5 max-md:py-1.5 rounded-[var(--radius-sm)] bg-[var(--color-neon-orange)] hover:bg-[var(--color-neon-orange-hover)] text-[13px] max-md:text-[11px] font-bold text-[var(--color-white)] inline-flex items-center gap-1.5 shadow-sm cursor-pointer transition-transform hover:scale-[1.02]"
+                className="px-3 py-1.5 max-md:px-2 max-md:py-1 rounded-[var(--radius-sm)] bg-[var(--color-neon-orange)] hover:bg-[var(--color-neon-orange-hover)] text-[12px] max-md:text-[10px] font-bold text-[var(--color-white)] inline-flex items-center gap-1 shadow-sm cursor-pointer transition-transform hover:scale-[1.02]"
               >
-                <Play className="w-4 h-4 max-md:w-3.5 max-md:h-3.5 fill-current" />
-                <span>تشغيل الصوت المصري الآن</span>
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>تشغيل الصوت</span>
               </button>
             )}
             <button
               type="button"
               disabled={sceneIndex === 0}
               onClick={() => handleSelectScene(Math.max(0, sceneIndex - 1))}
-              className="px-2.5 py-1.5 max-md:px-2 max-md:py-1 rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 disabled:opacity-40 text-[12px] max-md:text-[11px] font-bold text-[var(--color-white)] inline-flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
+              className="px-2 py-1 max-md:px-1.5 max-md:py-0.5 rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 disabled:opacity-40 text-[11px] max-md:text-[10px] font-bold text-[var(--color-white)] inline-flex items-center gap-0.5 cursor-pointer disabled:cursor-not-allowed"
             >
-              <ChevronRight className="w-4 h-4 max-md:w-3.5 max-md:h-3.5" />
+              <ChevronRight className="w-3.5 h-3.5 max-md:w-3 max-md:h-3" />
               <span>السابق</span>
             </button>
             <button
@@ -1397,20 +1404,20 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
                   Math.min(EXPLAINER_SCENES.length - 1, sceneIndex + 1)
                 )
               }
-              className="px-2.5 py-1.5 max-md:px-2 max-md:py-1 rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 disabled:opacity-40 text-[12px] max-md:text-[11px] font-bold text-[var(--color-white)] inline-flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
+              className="px-2 py-1 max-md:px-1.5 max-md:py-0.5 rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 disabled:opacity-40 text-[11px] max-md:text-[10px] font-bold text-[var(--color-white)] inline-flex items-center gap-0.5 cursor-pointer disabled:cursor-not-allowed"
             >
-              <span>الفصل التالي</span>
-              <ChevronLeft className="w-4 h-4 max-md:w-3.5 max-md:h-3.5" />
+              <span>التالي</span>
+              <ChevronLeft className="w-3.5 h-3.5 max-md:w-3 max-md:h-3" />
             </button>
           </div>
         </div>
       </div>
 
       {/* 5. Bottom Studio Controls Bar (Timeline Scrubber + Play/Pause + Voice Switcher + Speed) */}
-      <div className="px-4 sm:px-6 py-3 max-md:py-2 max-lg:pb-[max(14px,env(safe-area-inset-bottom))] bg-[#041E24] border-t border-[var(--color-white)]/15 space-y-2.5 max-md:space-y-1.5">
+      <div className="px-3 sm:px-6 py-2 max-md:py-1 max-lg:pb-[max(8px,env(safe-area-inset-bottom))] bg-[#041E24] border-t border-[var(--color-white)]/15 space-y-1.5 max-md:space-y-0.5 shrink-0">
         {/* Global Timeline Scrubber */}
-        <div className="flex items-center gap-3">
-          <span className="text-[12px] font-bold tabular-nums text-[var(--color-neon-orange)]">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] max-md:text-[9.5px] font-bold tabular-nums text-[var(--color-neon-orange)] shrink-0">
             {formatTimecode(currentTime)}
           </span>
           <input
@@ -1421,36 +1428,36 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
             step={0.2}
             value={currentTime}
             onChange={(e) => handleScrubTimeline(Number(e.target.value))}
-            className="flex-1 h-2 max-lg:h-4 accent-[var(--color-neon-orange)] cursor-pointer touch-none"
+            className="flex-1 h-1.5 max-md:h-2 accent-[var(--color-neon-orange)] cursor-pointer touch-none"
           />
-          <span className="text-[12px] tabular-nums text-[var(--color-white)]/75">
+          <span className="text-[11px] max-md:text-[9.5px] tabular-nums text-[var(--color-white)]/75 shrink-0">
             {formatTimecode(TOTAL_DURATION_SEC)}
           </span>
         </div>
 
         {/* Transport & Audio Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-1.5">
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
               onClick={handleTogglePlay}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 min-h-[44px] rounded-[var(--radius-sm)] bg-[var(--color-neon-orange)] hover:bg-[var(--color-neon-orange-hover)] text-[var(--color-white)] text-[13px] font-bold cursor-pointer transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-1 max-md:px-2 max-md:py-0.5 min-h-[36px] max-md:min-h-[28px] rounded-[var(--radius-sm)] bg-[var(--color-neon-orange)] hover:bg-[var(--color-neon-orange-hover)] text-[var(--color-white)] text-[12px] max-md:text-[10.5px] font-bold cursor-pointer transition-colors"
             >
               {isPlaying ? (
                 <>
-                  <Pause className="w-4 h-4" />
-                  <span>إيقاف مؤقت</span>
+                  <Pause className="w-3.5 h-3.5" />
+                  <span>إيقاف</span>
                 </>
               ) : sceneIndex === EXPLAINER_SCENES.length - 1 &&
                 sceneElapsedSec >= currentScene.durationSec - 0.3 ? (
                 <>
-                  <RotateCcw className="w-4 h-4" />
-                  <span>إعادة التشغيل</span>
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>إعادة</span>
                 </>
               ) : (
                 <>
-                  <Play className="w-4 h-4 fill-current" />
-                  <span>تشغيل الشرح الصوتي</span>
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>تشغيل</span>
                 </>
               )}
             </button>
@@ -1459,27 +1466,27 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
               type="button"
               onClick={() => handleSelectScene(0)}
               aria-label="إعادة الفيديو من الفصل الأول"
-              className="px-3 py-1.5 min-h-[44px] rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 text-[12px] font-semibold text-[var(--color-white)] cursor-pointer"
+              className="px-2.5 py-1 max-md:px-1.5 max-md:py-0.5 min-h-[36px] max-md:min-h-[28px] rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 text-[11px] max-md:text-[9.5px] font-semibold text-[var(--color-white)] cursor-pointer hidden sm:inline-flex"
             >
               من البداية
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
               onClick={() => setIsMuted((m) => !m)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 text-[12px] font-semibold text-[var(--color-white)] cursor-pointer"
+              className="inline-flex items-center gap-1 px-2.5 py-1 max-md:px-2 max-md:py-0.5 min-h-[36px] max-md:min-h-[28px] rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 text-[11px] max-md:text-[10px] font-semibold text-[var(--color-white)] cursor-pointer"
             >
               {isMuted ? (
                 <>
-                  <VolumeX className="w-4 h-4 text-[var(--color-neon-orange)]" />
-                  <span>الصوت مكتوم</span>
+                  <VolumeX className="w-3.5 h-3.5 text-[var(--color-neon-orange)]" />
+                  <span className="hidden sm:inline">الصوت مكتوم</span>
                 </>
               ) : (
                 <>
-                  <Volume2 className="w-4 h-4 text-[var(--color-green)]" />
-                  <span>صوت مصري طبيعي ({activeVoiceProfile.nameAr})</span>
+                  <Volume2 className="w-3.5 h-3.5 text-[var(--color-green)]" />
+                  <span className="hidden sm:inline">صوت ({activeVoiceProfile.nameAr})</span>
                 </>
               )}
             </button>
@@ -1487,9 +1494,9 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
             <button
               type="button"
               onClick={() => setPlaybackRate((r) => (r === 1 ? 1.25 : 1))}
-              className="px-2.5 py-1.5 min-h-[44px] rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 text-[12px] font-bold tabular-nums text-[var(--color-white)] cursor-pointer"
+              className="px-2 py-1 max-md:px-1.5 max-md:py-0.5 min-h-[36px] max-md:min-h-[28px] rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 text-[11px] max-md:text-[9.5px] font-bold tabular-nums text-[var(--color-white)] cursor-pointer"
             >
-              السرعة: {playbackRate}x
+              {playbackRate}x
             </button>
 
             {/* Mobile-only Theatre / Fullscreen Toggle Button (< 1024px) */}
@@ -1497,9 +1504,9 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
               type="button"
               onClick={toggleFullscreen}
               aria-label={isFullscreen ? 'الخروج من ملء الشاشة' : 'تكبير الشاشة (وضع المسرح)'}
-              className="lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-neon-orange)] text-[var(--color-white)] cursor-pointer transition-colors"
+              className="lg:hidden inline-flex items-center justify-center w-8 h-8 max-md:w-7 max-md:h-7 rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-neon-orange)] text-[var(--color-white)] cursor-pointer transition-colors"
             >
-              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
             </button>
           </div>
         </div>
@@ -1521,9 +1528,9 @@ export const PatientExplainerVideoModal: React.FC<{
       maxWidthClass="w-[99vw] max-w-[99vw]"
       overlayClassName="items-center justify-center bg-[#010C0F]/90 backdrop-blur-md p-1 sm:p-2 max-lg:p-0"
       panelClassName="bg-[#031A20] rounded-[16px] sm:rounded-[20px] max-lg:rounded-none max-lg:border-0 max-lg:h-[100dvh] max-lg:max-h-[100dvh] max-lg:w-full border border-cyan-400/35 ring-2 ring-[var(--color-neon-orange)]/35 shadow-[0_35px_120px_rgba(0,0,0,0.95)] h-[98dvh] max-h-[98dvh] flex flex-col overflow-hidden text-[var(--color-white)]"
-      bodyClassName="p-0 flex flex-col flex-1 overflow-y-auto bg-[#031A20]"
+      bodyClassName="p-0 flex flex-col flex-1 overflow-y-auto max-md:overflow-hidden bg-[#031A20]"
       customHeader={
-        <div className="px-4 sm:px-6 py-3.5 max-md:py-2 max-lg:pt-[max(10px,env(safe-area-inset-top))] max-lg:px-3 bg-gradient-to-l from-[#041E24] via-[#072E35] to-[#0A434D] border-b border-[var(--color-white)]/15 flex items-center justify-between gap-2 shrink-0">
+        <div className="px-4 sm:px-6 py-3.5 max-md:py-1 max-lg:pt-[max(8px,env(safe-area-inset-top))] max-lg:px-2.5 bg-gradient-to-l from-[#041E24] via-[#072E35] to-[#0A434D] border-b border-[var(--color-white)]/15 flex items-center justify-between gap-2 shrink-0">
           {/* Right Section: Live Badge + Title + Dialect */}
           <div className="flex items-center gap-2.5 min-w-0">
             <span className="w-9 h-9 max-md:w-7 max-md:h-7 rounded-xl max-md:rounded-lg bg-[var(--color-neon-orange)] text-[var(--color-white)] flex items-center justify-center shrink-0 shadow-md">
