@@ -82,3 +82,20 @@
   --z-toast: 500;
   --z-demo-banner: 600;
 }
+
+/* Phone-only token scaling (< 768px). Desktop and tablets (>= 768px) strictly untouched. */
+@media (max-width: 767.98px) {
+  :root {
+    --text-display: clamp(20px, 5vw, 24px);
+    --text-h1: clamp(18px, 4vw, 21px);
+    --text-h2: 17px;
+    --text-h3: 15px;
+    --text-body: 13px;
+    --space-6: 16px;
+    --space-8: 22px;
+    --space-10: 28px;
+    --space-12: 34px;
+    --space-16: 44px;
+    --space-20: 56px;
+  }
+}

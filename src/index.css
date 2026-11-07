@@ -242,6 +242,49 @@
   }
 }
 
+/* Phone-Only Editable Range (< 768px) - 30% Global Scale Down & Usability Safeguards */
+@media (max-width: 767.98px) {
+  html {
+    font-size: 70%;
+  }
+
+  body {
+    line-height: 1.7;
+    font-size: 13px;
+  }
+
+  /* Prevent iOS text auto-zoom on input focus by guaranteeing 16px font size */
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Interactive tap targets: guarantee at least ~40px */
+  button,
+  a[role="button"],
+  input[type="submit"],
+  input[type="button"],
+  [role="tab"] {
+    min-height: 40px;
+  }
+
+  /* Arbitrary px font sizes: scale down so they don't remain excessively large */
+  .text-\[34px\], .text-\[32px\], .text-\[30px\] { font-size: 22px !important; }
+  .text-\[28px\], .text-\[26px\], .text-\[24px\] { font-size: 17px !important; }
+  .text-\[22px\], .text-\[20px\], .text-\[19px\] { font-size: 15px !important; }
+  .text-\[18px\], .text-\[17px\] { font-size: 13.5px !important; }
+  .text-\[16px\], .text-\[15px\] { font-size: 12.5px !important; }
+
+  /* Ensure body text does not drop below 12px */
+  .text-\[14px\], .text-\[13px\] { font-size: 12px !important; }
+  .text-\[12px\], .text-\[11px\], .text-\[10px\] { font-size: 11px !important; }
+
+  /* Scale down arbitrary fixed heights */
+  .h-\[56px\], .h-\[52px\] { height: 42px !important; }
+  .h-\[48px\] { height: 40px !important; }
+}
+
 /* Mobile & Tablet Editable Range (< 1024px) - Scoped Additions Only. Desktop (>= 1024px) is strictly untouched. */
 @media (max-width: 1023.98px) {
   /* Prevent iOS text auto-zoom on input focus by guaranteeing 16px font size */
