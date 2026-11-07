@@ -95,29 +95,7 @@ const DemoAccountSwitcherMenu: React.FC<{
 };
 
 export const SiteFooter: React.FC = () => {
-  return (
-    <footer className="bg-[var(--color-white)] border-t border-[var(--color-border)] py-6 px-4 sm:px-8 mt-auto no-print">
-      <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-[var(--color-secondary-text)]">
-        <div className="flex items-center gap-2">
-          <span className="font-bold text-[var(--color-dark-teal)]">موعدي (Maw3edy)</span>
-          <span>·</span>
-          <span>منصة تجريبية لحجز العيادات وإدارة الطوابير الطبية في مصر — جميع البيانات وهمية.</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link
-            to="/dev/ui"
-            className="font-semibold text-[var(--color-dark-teal)] hover:underline"
-          >
-            دليل التصميم والمكونات (/dev/ui)
-          </Link>
-          <span>·</span>
-          <Link to="/login" className="hover:text-[var(--color-primary-text)] hover:underline">
-            تغيير الدور
-          </Link>
-        </div>
-      </div>
-    </footer>
-  );
+  return null;
 };
 
 export const PublicLayout: React.FC = () => {

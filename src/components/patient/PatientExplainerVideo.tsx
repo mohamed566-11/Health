@@ -1348,7 +1348,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
                 النص الصوتي ({activeVoiceProfile.nameAr}):
               </span>
             </div>
-            <p className="text-[13px] sm:text-[15px] max-md:text-[11px] leading-[1.4] font-semibold max-h-[44px] max-md:max-h-[28px] overflow-y-auto no-scrollbar">
+            <p className="text-[13px] sm:text-[15px] max-md:text-[11px] leading-[1.4] font-semibold max-h-[44px] max-md:max-h-[36px] overflow-y-auto no-scrollbar">
               {narrationWords.map((word, wIdx) => {
                 const isSpoken = wIdx < highlightedWordCount;
                 const isCurrentWord =
@@ -1374,8 +1374,8 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
             </p>
           </div>
 
-          {/* Quick Scene Nav */}
-          <div className="flex flex-wrap items-center gap-1.5 shrink-0 self-end sm:self-center">
+          {/* Quick Scene Nav (Desktop/Tablet) */}
+          <div className="max-md:hidden flex flex-wrap items-center gap-1.5 shrink-0 self-end sm:self-center">
             {!isPlaying && (
               <button
                 type="button"
@@ -1461,6 +1461,34 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
                 </>
               )}
             </button>
+
+            {/* Mobile Previous / Next Scene Buttons (< 768px) - Positioned in the controls bar away from subtitle text */}
+            <div className="md:hidden flex items-center gap-1">
+              <button
+                type="button"
+                disabled={sceneIndex === 0}
+                onClick={() => handleSelectScene(Math.max(0, sceneIndex - 1))}
+                aria-label="الفصل السابق"
+                className="px-2 py-0.5 min-h-[28px] rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 active:bg-[var(--color-white)]/30 disabled:opacity-30 text-[10px] font-bold text-[var(--color-white)] inline-flex items-center gap-0.5 cursor-pointer disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight className="w-3 h-3" />
+                <span>السابق</span>
+              </button>
+              <button
+                type="button"
+                disabled={sceneIndex === EXPLAINER_SCENES.length - 1}
+                onClick={() =>
+                  handleSelectScene(
+                    Math.min(EXPLAINER_SCENES.length - 1, sceneIndex + 1)
+                  )
+                }
+                aria-label="الفصل التالي"
+                className="px-2 py-0.5 min-h-[28px] rounded-[var(--radius-sm)] bg-[var(--color-white)]/10 hover:bg-[var(--color-white)]/20 active:bg-[var(--color-white)]/30 disabled:opacity-30 text-[10px] font-bold text-[var(--color-white)] inline-flex items-center gap-0.5 cursor-pointer disabled:cursor-not-allowed transition-colors"
+              >
+                <span>التالي</span>
+                <ChevronLeft className="w-3 h-3" />
+              </button>
+            </div>
 
             <button
               type="button"
