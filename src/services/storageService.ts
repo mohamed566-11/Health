@@ -31,7 +31,7 @@ import { SEED_MEDICAL_RECORDS, SEED_NOTIFICATIONS, SEED_REVIEWS } from '../data/
 import { canViewPrivateNote, canWritePrivateNote, filterAccessiblePrivateNotes } from './permissions';
 
 const NAMESPACE = 'maw3edy:v1';
-const SCHEMA_VERSION = '4.0.0';
+const SCHEMA_VERSION = '5.0.0';
 
 export const STORAGE_KEYS = {
   version: `${NAMESPACE}:schema_version`,

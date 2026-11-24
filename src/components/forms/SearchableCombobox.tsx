@@ -1,6 +1,5 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { Check, ChevronDown, Search, X } from 'lucide-react';
-import { matchesSearch } from '../../utils/formatters';
+import { Check, ChevronDown, X } from 'lucide-react';
 
 export interface ComboboxOption {
   id: string;
@@ -27,7 +26,6 @@ interface SearchableComboboxProps {
 export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
   label,
   placeholder,
-  searchPlaceholder = 'ابحث بالاسم...',
   value,
   options,
   onChange,
@@ -40,32 +38,15 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
   const componentId = externalId || generatedId;
 
   const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const mobileInputRef = useRef<HTMLInputElement>(null);
   const optionsListRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = useMemo(
     () => options.find((opt) => opt.id === value),
     [options, value]
   );
-
-  // Filter options based on normalized Arabic text search
-  const filteredOptions = useMemo(() => {
-    if (!searchQuery.trim()) return options;
-    return options.filter((opt) =>
-      matchesSearch(opt.label, searchQuery) ||
-      (opt.subtext && matchesSearch(opt.subtext, searchQuery))
-    );
-  }, [options, searchQuery]);
-
-  // Reset highlight index when filtered list changes
-  useEffect(() => {
-    setHighlightedIndex(0);
-  }, [filteredOptions]);
 
   // Handle outside clicks to close desktop popover
   useEffect(() => {
@@ -86,17 +67,8 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
   useEffect(() => {
     if (isOpen) {
       const originalOverflow = document.body.style.overflow;
-      // Focus the input shortly after opening
-      const timer = setTimeout(() => {
-        if (window.innerWidth < 768) {
-          mobileInputRef.current?.focus();
-        } else {
-          searchInputRef.current?.focus();
-        }
-      }, 60);
-
+      document.body.style.overflow = 'hidden';
       return () => {
-        clearTimeout(timer);
         document.body.style.overflow = originalOverflow;
       };
     }
@@ -106,7 +78,6 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
     if (isOptionDisabled) return;
     onChange(optionId);
     setIsOpen(false);
-    setSearchQuery('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -129,7 +100,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setHighlightedIndex((prev) =>
-        prev < filteredOptions.length - 1 ? prev + 1 : prev
+        prev < options.length - 1 ? prev + 1 : prev
       );
       return;
     }
@@ -142,7 +113,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
 
     if (e.key === 'Enter') {
       e.preventDefault();
-      const current = filteredOptions[highlightedIndex];
+      const current = options[highlightedIndex];
       if (current && !current.disabled) {
         handleSelect(current.id, current.disabled);
       }
@@ -217,42 +188,18 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
       {/* ======================================================== */}
       {isOpen && (
         <div className="hidden md:block absolute top-[calc(100%+6px)] inset-x-0 z-[var(--z-dropdown)] bg-[var(--color-white)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-md)] overflow-hidden animate-dropdown-in">
-          {/* Popover Search Bar */}
-          <div className="p-2 border-b border-[var(--color-border)] bg-[var(--color-background)]">
-            <div className="relative flex items-center">
-              <Search className="w-4 h-4 text-[var(--color-secondary-text)] absolute inset-inline-start-2.5 pointer-events-none" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder={searchPlaceholder}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full ps-8 pe-7 py-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-white)] text-[13.5px] text-[var(--color-primary-text)] focus:border-[var(--color-dark-teal)] focus:outline-none"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="absolute inset-inline-end-2 p-0.5 text-[var(--color-secondary-text)] hover:text-[var(--color-primary-text)] cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          </div>
-
           {/* Options List */}
           <div
             ref={optionsListRef}
             role="listbox"
-            className="max-h-[260px] overflow-y-auto dropdown-scroll p-1 space-y-0.5"
+            className="max-h-[280px] overflow-y-auto dropdown-scroll p-1.5 space-y-0.5"
           >
-            {filteredOptions.length === 0 ? (
+            {options.length === 0 ? (
               <div className="py-6 px-4 text-center text-[13px] text-[var(--color-secondary-text)]">
-                لا توجد نتائج تطابق بحثك
+                لا توجد خيارات متاحة
               </div>
             ) : (
-              filteredOptions.map((opt, idx) => {
+              options.map((opt, idx) => {
                 const isSelected = opt.id === value;
                 const isHighlighted = idx === highlightedIndex;
 
@@ -265,7 +212,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
                     disabled={opt.disabled}
                     onClick={() => handleSelect(opt.id, opt.disabled)}
                     onMouseEnter={() => setHighlightedIndex(idx)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[var(--radius-sm)] text-start text-[14px] transition-colors cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-[var(--radius-sm)] text-start text-[14px] transition-colors cursor-pointer ${
                       opt.disabled
                         ? 'opacity-50 cursor-not-allowed bg-transparent text-[var(--color-secondary-text)]'
                         : isSelected
@@ -338,7 +285,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
                   {label || placeholder}
                 </h3>
                 <p className="text-[12px] text-[var(--color-secondary-text)]">
-                  اختر من القائمة أدناه أو ابحث بالاسم
+                  اختر من القائمة أدناه
                 </p>
               </div>
               <button
@@ -350,46 +297,14 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
               </button>
             </div>
 
-            {/* Drawer Search Input (Must be 16px to prevent iOS auto-zoom) */}
-            <div className="p-3 bg-[var(--color-background)] border-b border-[var(--color-border)]">
-              <div className="relative flex items-center">
-                <Search className="w-5 h-5 text-[var(--color-secondary-text)] absolute inset-inline-start-3 pointer-events-none" />
-                <input
-                  ref={mobileInputRef}
-                  type="text"
-                  placeholder={searchPlaceholder}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ fontSize: '16px' }}
-                  className="w-full ps-10 pe-9 py-2.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-white)] text-[16px] text-[var(--color-primary-text)] focus:border-[var(--color-dark-teal)] focus:outline-none"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="absolute inset-inline-end-2.5 p-1 text-[var(--color-secondary-text)] cursor-pointer"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-            </div>
-
             {/* Drawer Options List (touch targets >= 48px) */}
             <div className="overflow-y-auto p-2 space-y-1.5 flex-1 divide-y divide-[var(--color-border)]/40">
-              {filteredOptions.length === 0 ? (
+              {options.length === 0 ? (
                 <div className="py-12 text-center text-[14px] text-[var(--color-secondary-text)] space-y-2">
-                  <p className="font-bold">لا توجد نتائج تطابق بحثك</p>
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="text-[13px] text-[var(--color-neon-orange)] font-bold underline"
-                  >
-                    مسح البحث وعرض كل الخيارات
-                  </button>
+                  <p className="font-bold">لا توجد خيارات متاحة</p>
                 </div>
               ) : (
-                filteredOptions.map((opt) => {
+                options.map((opt) => {
                   const isSelected = opt.id === value;
 
                   return (

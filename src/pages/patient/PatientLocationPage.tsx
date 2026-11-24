@@ -275,7 +275,6 @@ export const PatientLocationPage: React.FC = () => {
           <SearchableCombobox
             label="1. المحافظة:"
             placeholder="اختر المحافظة..."
-            searchPlaceholder="ابحث بالمحافظة (27 محافظة)..."
             value={selectedGovId}
             options={govOptions}
             onChange={handleGovChange}
@@ -286,7 +285,6 @@ export const PatientLocationPage: React.FC = () => {
           <SearchableCombobox
             label={`2. المركز / الحي في ${currentGov?.nameAr || 'المحافظة'}:`}
             placeholder={`كل المراكز في ${currentGov?.nameAr || 'المحافظة'}`}
-            searchPlaceholder="ابحث باسم المركز أو الحي..."
             value={selectedCenterId}
             options={centerOptions}
             onChange={handleCenterChange}
@@ -297,7 +295,6 @@ export const PatientLocationPage: React.FC = () => {
           <SearchableCombobox
             label="3. التخصص الطبي:"
             placeholder="كل التخصصات الطبية"
-            searchPlaceholder="ابحث بالتخصص (قلب، باطنة، عظام، نسا، مخ وأعصاب)..."
             value={selectedSpecId}
             options={specialtyComboboxOptions}
             onChange={(id) => {

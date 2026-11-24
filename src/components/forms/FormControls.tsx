@@ -149,7 +149,7 @@ export const TextArea: React.FC<
   );
 };
 
-// Custom Accessible RTL Dropdown with Search & Keyboard/Click-outside support
+// Custom Accessible RTL Dropdown with Keyboard/Click-outside support
 export const SelectField: React.FC<
   BaseFieldProps &
     React.SelectHTMLAttributes<HTMLSelectElement> & {
@@ -174,7 +174,6 @@ export const SelectField: React.FC<
   const selectId = id ?? generatedId;
   const [open, setOpen] = useState(false);
   const [openUpward, setOpenUpward] = useState(false);
-  const [filterQuery, setFilterQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -202,13 +201,11 @@ export const SelectField: React.FC<
     const handleOutsideClick = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
-        setFilterQuery('');
       }
     };
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setOpen(false);
-        setFilterQuery('');
       }
     };
     document.addEventListener('mousedown', handleOutsideClick);
@@ -229,12 +226,9 @@ export const SelectField: React.FC<
       onChange(syntheticEvent);
     }
     setOpen(false);
-    setFilterQuery('');
   };
 
-  const visibleOptions = filterQuery.trim()
-    ? options.filter((o) => o.label.toLowerCase().includes(filterQuery.trim().toLowerCase()))
-    : options;
+  const visibleOptions = options;
 
   return (
     <div ref={containerRef} className={`flex flex-col gap-1.5 w-full relative ${className}`}>
@@ -329,21 +323,6 @@ export const SelectField: React.FC<
           {/* accent bar — top for downward, bottom for upward */}
           {!openUpward && (
             <div className="h-1 bg-gradient-to-l from-[var(--color-neon-orange)] via-[var(--color-neon-orange)]/60 to-[var(--color-dark-teal)]/40" />
-          )}
-
-          {options.length > 6 && (
-            <div className="p-2.5 border-b border-[var(--color-border)] bg-gradient-to-l from-[var(--color-light-teal)] via-[var(--color-white)] to-[var(--color-white)]">
-              <div className="relative">
-                <Search className="w-4 h-4 text-[var(--color-secondary-text)] absolute start-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={filterQuery}
-                  onChange={(e) => setFilterQuery(e.target.value)}
-                  placeholder="ابحث داخل القائمة..."
-                  className="w-full h-10 ps-8 pe-3 rounded-[10px] bg-[var(--color-white)] border border-[var(--color-border)] text-[13px] text-[var(--color-primary-text)] placeholder:text-[var(--color-secondary-text)] transition-colors focus:border-[var(--color-dark-teal)] focus:ring-2 focus:ring-[var(--color-dark-teal)]/10"
-                />
-              </div>
-            </div>
           )}
 
           <div className="dropdown-scroll max-h-[280px] overflow-y-auto p-1.5">

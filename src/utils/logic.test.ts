@@ -102,7 +102,7 @@ test('Medical catalog includes 60+ doctors, 5 specialties, 60+ clinics, and all 
   assert.ok(approvedDoctors.length >= 60);
 });
 
-test('Cascading location and specialty filtering yields correct doctor counts', () => {
+test('Cascading location and specialty filtering yields complete doctor coverage across all governorates', () => {
   // Cairo has doctors in multiple specialties
   const cairoClinics = SEED_CLINICS.filter((c) => c.governorate === 'القاهرة');
   assert.ok(cairoClinics.length >= 10);
@@ -111,13 +111,23 @@ test('Cascading location and specialty filtering yields correct doctor counts', 
   const nasrClinics = cairoClinics.filter((c) => c.city === 'مدينة نصر');
   assert.ok(nasrClinics.length >= 3);
 
-  // Remote governorate empty state: New Valley has no Cardiology doctors
-  const newValleyClinics = SEED_CLINICS.filter((c) => c.governorate === 'الوادي الجديد');
-  const newValleyDoctors = SEED_DOCTORS.filter((d) =>
-    newValleyClinics.some((c) => d.clinicIds.includes(c.id))
-  );
-  const newValleyCardio = newValleyDoctors.filter((d) => d.specialtyId === 'spec-1');
-  assert.equal(newValleyCardio.length, 0, 'New Valley should intentionally have 0 cardio doctors for empty-state test');
+  // User requirement: Every governorate has doctors in all specialties
+  for (const gov of SEED_LOCATIONS) {
+    const govClinics = SEED_CLINICS.filter((c) => c.governorate === gov.nameAr);
+    assert.ok(govClinics.length >= 5, `Governorate ${gov.nameAr} should have at least 5 clinics (1 per specialty)`);
+
+    const govDoctors = SEED_DOCTORS.filter((d) =>
+      govClinics.some((c) => d.clinicIds.includes(c.id))
+    );
+
+    for (const spec of SEED_SPECIALTIES) {
+      const specDocs = govDoctors.filter((d) => d.specialtyId === spec.id);
+      assert.ok(
+        specDocs.length >= 1,
+        `Expected at least 1 doctor for ${spec.nameAr} in ${gov.nameAr}, got ${specDocs.length}`
+      );
+    }
+  }
 });
 
 test('Patient explainer video scenes and duration integrity', async () => {
