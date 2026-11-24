@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   AlertCircle,
   AlertTriangle,
   CheckCircle2,
   Info,
-  RotateCcw,
   ShieldAlert,
   X,
 } from 'lucide-react';

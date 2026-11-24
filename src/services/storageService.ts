@@ -4,11 +4,14 @@ import {
   Clinic,
   Doctor,
   DoctorPrivateNote,
+  Fine,
   GovernorateLocation,
   MedicalRecordItem,
   MedicineCatalogItem,
   Nurse,
   Patient,
+  PatientFlowState,
+  PatientSession,
   Prescription,
   PrescriptionTemplate,
   Review,
@@ -18,6 +21,7 @@ import {
 import { SEED_APPOINTMENTS } from '../data/appointments';
 import { SEED_CLINICS, SEED_LOCATIONS, SEED_SPECIALTIES } from '../data/clinics';
 import { SEED_DOCTORS } from '../data/doctors';
+import { SEED_FINES } from '../data/fines';
 import { SEED_MEDICINES, SEED_TEMPLATES } from '../data/medicines';
 import { SEED_NOTES } from '../data/notes';
 import { SEED_NURSES } from '../data/nurses';
@@ -27,7 +31,7 @@ import { SEED_MEDICAL_RECORDS, SEED_NOTIFICATIONS, SEED_REVIEWS } from '../data/
 import { canViewPrivateNote, canWritePrivateNote, filterAccessiblePrivateNotes } from './permissions';
 
 const NAMESPACE = 'maw3edy:v1';
-const SCHEMA_VERSION = '2.0.0';
+const SCHEMA_VERSION = '4.0.0';
 
 export const STORAGE_KEYS = {
   version: `${NAMESPACE}:schema_version`,
@@ -46,6 +50,9 @@ export const STORAGE_KEYS = {
   medicalRecords: `${NAMESPACE}:medical_records`,
   notifications: `${NAMESPACE}:notifications`,
   reviews: `${NAMESPACE}:reviews`,
+  fines: `${NAMESPACE}:fines`,
+  patientFlow: `${NAMESPACE}:patient-flow`,
+  patientSession: `${NAMESPACE}:patient-session`,
   lastUpdated: `${NAMESPACE}:last_updated`,
 } as const;
 
@@ -130,6 +137,7 @@ export function seedAllDemoData(clearSession = false): void {
   writeStorage(STORAGE_KEYS.medicalRecords, SEED_MEDICAL_RECORDS);
   writeStorage(STORAGE_KEYS.notifications, SEED_NOTIFICATIONS);
   writeStorage(STORAGE_KEYS.reviews, SEED_REVIEWS);
+  writeStorage(STORAGE_KEYS.fines, SEED_FINES);
   if (clearSession) {
     rawRemove(STORAGE_KEYS.session);
   }
@@ -224,6 +232,7 @@ export interface SnapshotState {
   medicalRecords: MedicalRecordItem[];
   notifications: AppNotification[];
   reviews: Review[];
+  fines: Fine[];
 }
 
 export function loadFullSnapshot(): SnapshotState {
@@ -242,5 +251,87 @@ export function loadFullSnapshot(): SnapshotState {
     medicalRecords: readStorage(STORAGE_KEYS.medicalRecords, SEED_MEDICAL_RECORDS),
     notifications: readStorage(STORAGE_KEYS.notifications, SEED_NOTIFICATIONS),
     reviews: readStorage(STORAGE_KEYS.reviews, SEED_REVIEWS),
+    fines: readStorage(STORAGE_KEYS.fines, SEED_FINES),
   };
+}
+
+// ==========================================
+// BACKEND-READY REPOSITORY INTERFACE
+// ==========================================
+
+export async function getDoctorsRepo(): Promise<Doctor[]> {
+  return readStorage<Doctor[]>(STORAGE_KEYS.doctors, SEED_DOCTORS);
+}
+
+export async function getDoctorByIdRepo(id: string): Promise<Doctor | undefined> {
+  const doctors = readStorage<Doctor[]>(STORAGE_KEYS.doctors, SEED_DOCTORS);
+  return doctors.find((d) => d.id === id);
+}
+
+export async function getUnpaidFinesForPhoneRepo(phone: string): Promise<Fine[]> {
+  const cleanPhone = phone.trim();
+  const fines = readStorage<Fine[]>(STORAGE_KEYS.fines, SEED_FINES);
+  return fines.filter((f) => f.patientPhone.trim() === cleanPhone && f.status === 'unpaid');
+}
+
+export async function getUnpaidFinesTotalForPhoneRepo(phone: string): Promise<number> {
+  const unpaid = await getUnpaidFinesForPhoneRepo(phone);
+  return unpaid.reduce((sum, f) => sum + f.amount, 0);
+}
+
+export async function createFineRepo(fine: Omit<Fine, 'id' | 'createdAt' | 'status'>): Promise<Fine> {
+  const fines = readStorage<Fine[]>(STORAGE_KEYS.fines, SEED_FINES);
+  const newFine: Fine = {
+    ...fine,
+    id: `fine-${Date.now()}`,
+    status: 'unpaid',
+    createdAt: new Date().toISOString(),
+  };
+  writeStorage(STORAGE_KEYS.fines, [newFine, ...fines]);
+  return newFine;
+}
+
+export async function markFinesAsPaidRepo(fineIds: string[]): Promise<void> {
+  const fines = readStorage<Fine[]>(STORAGE_KEYS.fines, SEED_FINES);
+  const now = new Date().toISOString();
+  const updated = fines.map((f) =>
+    fineIds.includes(f.id) ? { ...f, status: 'paid' as const, paidAt: now } : f
+  );
+  writeStorage(STORAGE_KEYS.fines, updated);
+}
+
+export async function updateDoctorSettingsRepo(
+  doctorId: string,
+  settings: Partial<Doctor>
+): Promise<Doctor> {
+  const doctors = readStorage<Doctor[]>(STORAGE_KEYS.doctors, SEED_DOCTORS);
+  const idx = doctors.findIndex((d) => d.id === doctorId);
+  if (idx === -1) throw new Error('الطبيب غير موجود');
+  const updated: Doctor = {
+    ...doctors[idx],
+    ...settings,
+  };
+  doctors[idx] = updated;
+  writeStorage(STORAGE_KEYS.doctors, doctors);
+  return updated;
+}
+
+export function getPatientSession(): PatientSession | null {
+  return readStorage<PatientSession | null>(STORAGE_KEYS.patientSession, null);
+}
+
+export function setPatientSession(session: PatientSession | null): void {
+  if (!session) {
+    rawRemove(STORAGE_KEYS.patientSession);
+  } else {
+    writeStorage(STORAGE_KEYS.patientSession, session);
+  }
+}
+
+export function getPatientFlow(): PatientFlowState {
+  return readStorage<PatientFlowState>(STORAGE_KEYS.patientFlow, {});
+}
+
+export function setPatientFlow(flow: PatientFlowState): void {
+  writeStorage(STORAGE_KEYS.patientFlow, flow);
 }

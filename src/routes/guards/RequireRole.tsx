@@ -16,13 +16,13 @@ export const RequireRole: React.FC<{
   }, [location.pathname]);
 
   if (!session) {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    return <Navigate to={role === 'admin' ? '/administration' : '/'} state={{ from: location.pathname }} replace />;
   }
 
   if (!canAccessRoleRoute(session, role)) {
     return (
       <Navigate
-        to="/login"
+        to={role === 'admin' ? '/administration' : '/'}
         state={{
           forbiddenRole: role,
           currentRole: session.role,

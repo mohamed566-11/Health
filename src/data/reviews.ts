@@ -187,7 +187,7 @@ export const SEED_NOTIFICATIONS: AppNotification[] = [
     message: 'أمامك الآن 4 مرضى في عيادة د. أحمد محمود (رقم حجزك #025). الوقت المتوقع حوالي 45 دقيقة تقريبًا.',
     read: false,
     createdAt: '2026-11-05T17:20:00.000Z',
-    linkTo: '/patient/queue/apt-6',
+    linkTo: '/patient/track/apt-6',
   },
   {
     id: 'notif-2',
@@ -197,7 +197,7 @@ export const SEED_NOTIFICATIONS: AppNotification[] = [
     message: 'تم تأكيد حجزك رقم #025 لدى د. أحمد محمود بعيادة دار القلب — مدينة نصر اليوم الساعة 06:15 م.',
     read: false,
     createdAt: '2026-11-05T09:01:00.000Z',
-    linkTo: '/patient/appointments/apt-6',
+    linkTo: '/patient/track/apt-6',
   },
   {
     id: 'notif-3',

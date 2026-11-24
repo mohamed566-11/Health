@@ -558,7 +558,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
             <button
               type="button"
               onClick={onExpandModal}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 max-md:px-4 max-md:py-2.5 min-h-[42px] rounded-[var(--radius-md)] bg-[var(--color-neon-orange)] hover:bg-[var(--color-neon-orange-hover)] text-[var(--color-white)] text-[15px] max-md:text-[13px] font-bold shadow-lg shadow-[var(--color-neon-orange)]/35 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 max-md:px-4 max-md:py-2.5 min-h-[42px] rounded-[var(--radius-md)] bg-[var(--color-neon-orange)] hover:bg-[var(--color-orange-hover)] text-[var(--color-white)] text-[15px] max-md:text-[13px] font-bold shadow-lg shadow-[var(--color-neon-orange)]/35 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <Play className="w-5 h-5 max-md:w-4 max-md:h-4 fill-current" />
               <span>تشغيل الفيديو التوضيحي بالكامل</span>
@@ -746,7 +746,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
             <button
               type="button"
               onClick={handleTogglePlay}
-              className="px-2.5 py-1 rounded bg-[var(--color-neon-orange)] hover:bg-[var(--color-neon-orange-hover)] text-[11px] font-bold text-[var(--color-white)] inline-flex items-center gap-1 cursor-pointer transition-colors"
+              className="px-2.5 py-1 rounded bg-[var(--color-neon-orange)] hover:bg-[var(--color-orange-hover)] text-[11px] font-bold text-[var(--color-white)] inline-flex items-center gap-1 cursor-pointer transition-colors"
             >
               {isPlaying ? (
                 <>
@@ -1381,7 +1381,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
                 type="button"
                 onClick={handleTogglePlay}
                 aria-label="تشغيل الفيديو التوضيحي بالصوت المصري الطبيعي"
-                className="px-3 py-1.5 max-md:px-2 max-md:py-1 rounded-[var(--radius-sm)] bg-[var(--color-neon-orange)] hover:bg-[var(--color-neon-orange-hover)] text-[12px] max-md:text-[10px] font-bold text-[var(--color-white)] inline-flex items-center gap-1 shadow-sm cursor-pointer transition-transform hover:scale-[1.02]"
+                className="px-3 py-1.5 max-md:px-2 max-md:py-1 rounded-[var(--radius-sm)] bg-[var(--color-neon-orange)] hover:bg-[var(--color-orange-hover)] text-[12px] max-md:text-[10px] font-bold text-[var(--color-white)] inline-flex items-center gap-1 shadow-sm cursor-pointer transition-transform hover:scale-[1.02]"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>تشغيل الصوت</span>
@@ -1441,7 +1441,7 @@ export const PatientExplainerVideoPlayer: React.FC<PatientExplainerVideoPlayerPr
             <button
               type="button"
               onClick={handleTogglePlay}
-              className="inline-flex items-center gap-1 px-3 py-1 max-md:px-2 max-md:py-0.5 min-h-[36px] max-md:min-h-[28px] rounded-[var(--radius-sm)] bg-[var(--color-neon-orange)] hover:bg-[var(--color-neon-orange-hover)] text-[var(--color-white)] text-[12px] max-md:text-[10.5px] font-bold cursor-pointer transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-1 max-md:px-2 max-md:py-0.5 min-h-[36px] max-md:min-h-[28px] rounded-[var(--radius-sm)] bg-[var(--color-neon-orange)] hover:bg-[var(--color-orange-hover)] text-[var(--color-white)] text-[12px] max-md:text-[10.5px] font-bold cursor-pointer transition-colors"
             >
               {isPlaying ? (
                 <>

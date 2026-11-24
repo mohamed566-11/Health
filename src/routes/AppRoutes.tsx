@@ -1,39 +1,26 @@
 import React, { Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import {
   AdminLayout,
   DoctorLayout,
   NurseLayout,
-  PatientLayout,
   PublicLayout,
 } from '../layouts/AppLayouts';
 import { RequireRole } from './guards/RequireRole';
 import { Skeleton } from '../components/common/UIPrimitives';
 import {
   NotFoundPage,
-  OnboardingPage,
-  RegisterPage,
-  WelcomeLoginPage,
 } from '../pages/public/PublicPages';
+import { AdminLoginPage } from '../pages/admin/AdminLoginPage';
 import { DevStyleGuidePage } from '../pages/public/DevStyleGuide';
-import {
-  BookingConfirmationPage,
-  BookingPage,
-  DoctorProfilePage,
-  DoctorSearchPage,
-  PatientDashboardPage,
-} from '../pages/patient/PatientDiscoveryAndBooking';
-import {
-  AppointmentDetailsPage,
-  AppointmentsPage,
-  MedicalRecordsPage,
-  NotificationsPage,
-  PatientHelpPage,
-  PatientProfilePage,
-  PrescriptionsListPage,
-  PrescriptionViewPage,
-  QueueTrackingPage,
-} from '../pages/patient/PatientCareAndRecords';
+import { WelcomeRoleChooserPage } from '../pages/public/WelcomeRoleChooserPage';
+import { PatientLocationPage } from '../pages/patient/PatientLocationPage';
+import { PatientSpecialtiesPage } from '../pages/patient/PatientSpecialtiesPage';
+import { PatientDoctorsPage } from '../pages/patient/PatientDoctorsPage';
+import { PatientBookingPage } from '../pages/patient/PatientBookingPage';
+import { PatientTrackingPage } from '../pages/patient/PatientTrackingPage';
+import { PatientFindBookingPage } from '../pages/patient/PatientFindBookingPage';
+import { PrescriptionViewPage } from '../pages/patient/PrescriptionViewPage';
 import {
   DoctorClinicsPage,
   DoctorDashboardPage,
@@ -44,6 +31,7 @@ import {
   DoctorVisitWorkflowPage,
   PrescriptionBuilderPage,
 } from '../pages/doctor/DoctorPages';
+import { DoctorSettingsPage } from '../pages/doctor/DoctorSettingsPage';
 import {
   NurseDashboardPage,
   NursePatientsPage,
@@ -70,45 +58,41 @@ const RouteFallback: React.FC = () => (
   </div>
 );
 
+const ParamRedirectToTrack: React.FC = () => {
+  const { appointmentId } = useParams<{ appointmentId: string }>();
+  return <Navigate to={appointmentId ? `/patient/track/${appointmentId}` : '/patient/find'} replace />;
+};
+
 export const AppRoutes: React.FC = () => {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
-        {/* Public & Authentication Routes */}
+        {/* Public & Patient Flow Routes (No Login Required) */}
         <Route element={<PublicLayout />}>
-          <Route path="/" element={<WelcomeLoginPage />} />
-          <Route path="/login" element={<WelcomeLoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/onboarding" element={<OnboardingPage />} />
+          <Route path="/" element={<WelcomeRoleChooserPage />} />
+          <Route path="/administration" element={<AdminLoginPage />} />
+          <Route path="/login" element={<Navigate to="/" replace />} />
+          <Route path="/register" element={<Navigate to="/" replace />} />
+          <Route path="/onboarding" element={<Navigate to="/" replace />} />
           <Route path="/dev/ui" element={<DevStyleGuidePage />} />
-        </Route>
 
-        {/* Patient Area Routes (Protected by RequireRole="patient") */}
-        <Route
-          path="/patient"
-          element={
-            <RequireRole role="patient">
-              <PatientLayout />
-            </RequireRole>
-          }
-        >
-          <Route index element={<PatientDashboardPage />} />
-          <Route path="doctors" element={<DoctorSearchPage />} />
-          <Route path="doctors/:doctorId" element={<DoctorProfilePage />} />
-          <Route path="booking/:doctorId" element={<BookingPage />} />
-          <Route
-            path="booking-confirmation/:appointmentId"
-            element={<BookingConfirmationPage />}
-          />
-          <Route path="queue/:appointmentId" element={<QueueTrackingPage />} />
-          <Route path="appointments" element={<AppointmentsPage />} />
-          <Route path="appointments/:appointmentId" element={<AppointmentDetailsPage />} />
-          <Route path="records" element={<MedicalRecordsPage />} />
-          <Route path="prescriptions" element={<PrescriptionsListPage />} />
-          <Route path="prescriptions/:prescriptionId" element={<PrescriptionViewPage />} />
-          <Route path="notifications" element={<NotificationsPage />} />
-          <Route path="profile" element={<PatientProfilePage />} />
-          <Route path="help" element={<PatientHelpPage />} />
+          {/* Redesigned Streamlined Patient Flow */}
+          <Route path="/patient" element={<PatientLocationPage />} />
+          <Route path="/patient/specialties" element={<PatientSpecialtiesPage />} />
+          <Route path="/patient/doctors" element={<PatientDoctorsPage />} />
+          <Route path="/patient/book/:doctorId" element={<PatientBookingPage />} />
+          <Route path="/patient/track/:appointmentId" element={<PatientTrackingPage />} />
+          <Route path="/patient/find" element={<PatientFindBookingPage />} />
+          <Route path="/patient/prescriptions/:prescriptionId" element={<PrescriptionViewPage />} />
+
+          {/* Legacy route aliases (prevent 404 on bookmarks & simulated links) */}
+          <Route path="/patient/queue/:appointmentId" element={<ParamRedirectToTrack />} />
+          <Route path="/patient/appointments/:appointmentId" element={<ParamRedirectToTrack />} />
+          <Route path="/patient/appointments" element={<Navigate to="/patient/find" replace />} />
+          <Route path="/patient/records" element={<Navigate to="/patient/find" replace />} />
+          <Route path="/patient/profile" element={<Navigate to="/patient/find" replace />} />
+          <Route path="/patient/help" element={<Navigate to="/patient" replace />} />
+          <Route path="/patient/notifications" element={<Navigate to="/patient/find" replace />} />
         </Route>
 
         {/* Doctor Area Routes (Protected by RequireRole="doctor") */}
@@ -128,6 +112,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="prescriptions/new" element={<PrescriptionBuilderPage />} />
           <Route path="notes" element={<DoctorNotesPage />} />
           <Route path="visit/:appointmentId" element={<DoctorVisitWorkflowPage />} />
+          <Route path="settings" element={<DoctorSettingsPage />} />
         </Route>
 
         {/* Nurse / Receptionist Area Routes (Protected by RequireRole="nurse") */}

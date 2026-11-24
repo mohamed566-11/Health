@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Check, Grid, HeartPulse, Stethoscope, Users } from 'lucide-react';
+import { Calendar, Check, Grid } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import {
   Avatar,

@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Activity,
-  Bell,
   Building2,
   Calendar,
   ChevronDown,
@@ -9,9 +8,6 @@ import {
   ChevronRight,
   ClipboardList,
   Clock,
-  FileText,
-  HelpCircle,
-  Home,
   LayoutDashboard,
   Lock,
   LogOut,
@@ -19,13 +15,10 @@ import {
   Menu,
   MessageSquare,
   Pill,
-  PlayCircle,
   PlusCircle,
-  Search,
   Settings,
   Shield,
   Stethoscope,
-  User,
   UserPlus,
   Users,
   X,
@@ -34,9 +27,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import { useApp } from '../contexts/AppContext';
 import { UserRole } from '../types';
 import { Avatar } from '../components/common/UIPrimitives';
-import { DemoTopBanner, ToastViewport } from '../components/modals/Overlays';
-import { PatientExplainerVideoModal } from '../components/patient/PatientExplainerVideo';
-import { formatNumber, formatRelativeTimeArabic } from '../utils/formatters';
+import { ToastViewport } from '../components/modals/Overlays';
 import { getDefaultHomeRouteForRole } from '../services/permissions';
 import { useLockBodyScroll } from '../hooks/useLockBodyScroll';
 
@@ -110,318 +101,6 @@ export const PublicLayout: React.FC = () => {
         <Outlet />
       </main>
       <SiteFooter />
-      <ToastViewport />
-    </div>
-  );
-};
-
-export const PatientLayout: React.FC = () => {
-  const { session, notifications, markNotificationRead, logout, debugGrid } = useApp();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
-  const [videoModalOpen, setVideoModalOpen] = useState(false);
-  const actionsContainerRef = useRef<HTMLDivElement>(null);
-
-  const patientNotifs = notifications.filter(
-    (n) => n.userId === (session?.id ?? 'pat-1')
-  );
-  const unreadCount = patientNotifs.filter((n) => !n.read).length;
-
-  useEffect(() => {
-    setUserMenuOpen(false);
-    setNotifOpen(false);
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (!userMenuOpen && !notifOpen) return;
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (
-        actionsContainerRef.current &&
-        !actionsContainerRef.current.contains(e.target as Node)
-      ) {
-        setUserMenuOpen(false);
-        setNotifOpen(false);
-      }
-    };
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setUserMenuOpen(false);
-        setNotifOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleOutsideClick);
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [notifOpen, userMenuOpen]);
-
-  const desktopNavLinks = [
-    { to: '/patient', label: 'الرئيسية', end: true },
-    { to: '/patient/doctors', label: 'الأطباء' },
-    { to: '/patient/appointments', label: 'حجوزاتي' },
-    { to: '/patient/records', label: 'السجل الطبي' },
-    { to: '/patient/prescriptions', label: 'الروشتات' },
-  ];
-
-  const mobileBottomLinks = [
-    { to: '/patient', label: 'الرئيسية', icon: <Home className="w-5 h-5" />, end: true },
-    { to: '/patient/doctors', label: 'الأطباء', icon: <Stethoscope className="w-5 h-5" /> },
-    { to: '/patient/appointments', label: 'حجوزاتي', icon: <Calendar className="w-5 h-5" /> },
-    { to: '/patient/records', label: 'السجل', icon: <FileText className="w-5 h-5" /> },
-    { to: '/patient/profile', label: 'حسابي', icon: <User className="w-5 h-5" /> },
-  ];
-
-  return (
-    <div className="min-h-[100dvh] flex flex-col bg-[var(--color-background)] max-md:pb-[calc(76px+env(safe-area-inset-bottom,0px))] md:pb-0">
-      <a href="#main-content" className="skip-link">
-        تخطي إلى المحتوى الرئيسي
-      </a>
-      {debugGrid && <div className="debug-grid-overlay" aria-hidden="true" />}
-
-      {/* Patient Top Header (Dark Teal #0B434C) */}
-      <header className="sticky top-0 z-[var(--z-sticky)] h-[56px] md:h-[64px] bg-[var(--color-dark-teal)] text-[var(--color-white)] px-4 sm:px-6 lg:px-8 border-b border-[var(--color-white)]/10">
-        <div className="max-w-[1200px] h-full mx-auto flex items-center justify-between gap-4 sm:gap-6">
-          {/* Zone 1: Brand wordmark */}
-          <Link
-            to="/patient"
-            className="text-[22px] font-bold tracking-tight text-[var(--color-white)] whitespace-nowrap shrink-0 flex items-center gap-2"
-          >
-            <span className="w-3 h-3 rounded-full bg-[var(--color-neon-orange)] inline-block" />
-            <span>موعدي</span>
-          </Link>
-
-          {/* Zone 2: Desktop Navigation Links */}
-          <nav
-            aria-label="التنقل الرئيسي للمريض"
-            className="hidden md:flex items-center gap-6 text-[15px]"
-          >
-            {desktopNavLinks.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.end}
-                className={({ isActive }) =>
-                  `py-2 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
-                    isActive
-                      ? 'border-[var(--color-neon-orange)] text-[var(--color-white)] font-bold'
-                      : 'border-transparent text-[var(--color-white)]/80 hover:text-[var(--color-white)]'
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
-
-          {/* Zone 3: Actions (Explainer Video, Search, Notifications, User & Demo Switcher) */}
-          <div
-            ref={actionsContainerRef}
-            className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 relative"
-          >
-            <button
-              type="button"
-              onClick={() => setVideoModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[var(--radius-sm)] bg-[var(--color-teal-mid)] hover:bg-[var(--color-neon-orange)] text-[var(--color-white)] text-[13px] font-bold transition-colors cursor-pointer"
-            >
-              <PlayCircle className="w-4 h-4 text-[var(--color-neon-orange)] shrink-0" />
-              <span className="hidden sm:inline">فيديو الشرح</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigate('/patient/doctors')}
-              aria-label="بحث عن طبيب"
-              className="w-10 h-10 rounded-[var(--radius-sm)] flex items-center justify-center text-[var(--color-white)] hover:bg-[var(--color-teal-hover)] cursor-pointer"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-
-            {/* Notification Bell */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => {
-                  setNotifOpen((o) => !o);
-                  setUserMenuOpen(false);
-                }}
-                aria-label={`الإشعارات (${unreadCount} غير مقروءة)`}
-                aria-expanded={notifOpen}
-                className="relative w-10 h-10 rounded-[var(--radius-sm)] flex items-center justify-center text-[var(--color-white)] hover:bg-[var(--color-teal-hover)] cursor-pointer"
-              >
-                <Bell className="w-5 h-5" />
-                {unreadCount > 0 && (
-                  <span className="absolute top-1.5 end-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--color-neon-orange)] text-[var(--color-white)] text-[11px] font-bold tabular-nums flex items-center justify-center">
-                    {formatNumber(unreadCount)}
-                  </span>
-                )}
-              </button>
-
-              {notifOpen && (
-                <div className="absolute end-0 mt-2 w-[300px] sm:w-[350px] max-w-[calc(100vw-2rem)] bg-[var(--color-white)] text-[var(--color-primary-text)] rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-md)] z-[var(--z-dropdown)] overflow-hidden">
-                  <div className="px-4 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
-                    <span className="font-bold text-[15px]">الإشعارات</span>
-                    <Link
-                      to="/patient/notifications"
-                      className="text-[13px] font-semibold text-[var(--color-dark-teal)] hover:underline"
-                    >
-                      عرض الكل
-                    </Link>
-                  </div>
-                  <div className="max-h-[320px] overflow-y-auto divide-y divide-[var(--color-border)]">
-                    {patientNotifs.slice(0, 4).map((n) => (
-                      <button
-                        key={n.id}
-                        type="button"
-                        onClick={() => {
-                          markNotificationRead(n.id);
-                          setNotifOpen(false);
-                          if (n.linkTo) navigate(n.linkTo);
-                        }}
-                        className={`w-full text-start p-3.5 hover:bg-[var(--color-light-teal)] transition-colors cursor-pointer ${
-                          !n.read ? 'bg-[var(--color-light-teal)]/50' : ''
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2 mb-1">
-                          <span className="text-[14px] font-bold text-[var(--color-primary-text)]">
-                            {n.title}
-                          </span>
-                          <span className="text-[12px] text-[var(--color-secondary-text)]">
-                            {formatRelativeTimeArabic(n.createdAt)}
-                          </span>
-                        </div>
-                        <p className="text-[13px] text-[var(--color-secondary-text)] line-clamp-2">
-                          {n.message}
-                        </p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* User & DEMO MODE Menu */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => {
-                  setUserMenuOpen((o) => !o);
-                  setNotifOpen(false);
-                }}
-                aria-expanded={userMenuOpen}
-                aria-label="قائمة الحساب وتبديل الوضع التجريبي"
-                className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-[var(--radius-sm)] hover:bg-[var(--color-teal-hover)] cursor-pointer"
-              >
-                <Avatar name={session?.name ?? 'أحمد محمد'} size={32} variant="light" />
-                <span className="hidden sm:inline text-[14px] font-semibold truncate max-w-[120px]">
-                  {session?.name ?? 'أحمد محمد'}
-                </span>
-                <ChevronDown className="w-4 h-4 opacity-80" />
-              </button>
-
-              {userMenuOpen && (
-                <div className="absolute end-0 mt-2 w-[280px] bg-[var(--color-white)] text-[var(--color-primary-text)] rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-md)] z-[var(--z-dropdown)] p-2 space-y-1">
-                  <Link
-                    to="/patient/profile"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-[var(--radius-sm)] text-[14px] font-semibold hover:bg-[var(--color-light-teal)]"
-                  >
-                    <User className="w-4 h-4 text-[var(--color-dark-teal)]" />
-                    <span>الملف الشخصي والإعدادات</span>
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setUserMenuOpen(false);
-                      setVideoModalOpen(true);
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[var(--radius-sm)] text-[14px] font-semibold text-[var(--color-dark-teal)] hover:bg-[var(--color-light-teal)] cursor-pointer"
-                  >
-                    <PlayCircle className="w-4 h-4 text-[var(--color-neon-orange)]" />
-                    <span>تشغيل الفيديو التوضيحي للمريض</span>
-                  </button>
-                  <Link
-                    to="/patient/help"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-[var(--radius-sm)] text-[14px] font-semibold hover:bg-[var(--color-light-teal)]"
-                  >
-                    <HelpCircle className="w-4 h-4 text-[var(--color-dark-teal)]" />
-                    <span>المساعدة ودليل الاستخدام</span>
-                  </Link>
-                  <div className="border-t border-[var(--color-border)] my-1 pt-1">
-                    <DemoAccountSwitcherMenu onSelected={() => setUserMenuOpen(false)} />
-                  </div>
-                  <div className="border-t border-[var(--color-border)] pt-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        logout();
-                        navigate('/login');
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[var(--radius-sm)] text-[14px] font-semibold text-[var(--color-red)] hover:bg-[var(--color-red-subtle)] cursor-pointer"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>تسجيل الخروج</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content Container (max-width 1200px) */}
-      <main
-        id="main-content"
-        className="flex-1 w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8"
-      >
-        <Outlet />
-      </main>
-
-      <PatientExplainerVideoModal
-        open={videoModalOpen}
-        onClose={() => setVideoModalOpen(false)}
-      />
-
-      <SiteFooter />
-
-      {/* Mobile Fixed Bottom Navigation (5 items) */}
-      <nav
-        aria-label="التنقل السفلي للمريض"
-        className="md:hidden fixed bottom-0 inset-x-0 min-h-[64px] bg-[var(--color-white)] border-t border-[var(--color-border)] z-[var(--z-sticky)] grid grid-cols-5 no-print"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-      >
-        {mobileBottomLinks.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.end}
-            className={({ isActive }) =>
-              `relative flex flex-col items-center justify-center gap-1 text-[12px] transition-colors ${
-                isActive
-                  ? 'text-[var(--color-dark-teal)] font-bold'
-                  : 'text-[var(--color-secondary-text)] font-medium'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                {isActive && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-0 inset-x-3 h-[3px] rounded-b-full bg-[var(--color-neon-orange)]"
-                  />
-                )}
-                {item.icon}
-                <span>{item.label}</span>
-              </>
-            )}
-          </NavLink>
-        ))}
-      </nav>
-
       <ToastViewport />
     </div>
   );
@@ -563,8 +242,9 @@ const StaffWorkspaceShell: React.FC<{
           <button
             type="button"
             onClick={() => {
+              const isAdmin = session?.role === 'admin';
               logout();
-              navigate('/login');
+              navigate(isAdmin ? '/administration' : '/');
             }}
             aria-label="تسجيل الخروج"
             title="تسجيل الخروج"
@@ -645,7 +325,7 @@ const StaffWorkspaceShell: React.FC<{
                 <span>مزامنة فورية عبر المتصفح</span>
               </span>
               <Link
-                to="/login"
+                to="/"
                 className="px-3 py-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] text-[13px] font-semibold text-[var(--color-dark-teal)] hover:bg-[var(--color-light-teal)]"
               >
                 تبديل الدور
@@ -701,6 +381,11 @@ export const DoctorLayout: React.FC = () => {
       to: '/doctor/schedule',
       label: 'جدول المواعيد والإجازات',
       icon: <Calendar className="w-5 h-5" />,
+    },
+    {
+      to: '/doctor/settings',
+      label: 'إعدادات الطابور والكشوفات',
+      icon: <Settings className="w-5 h-5" />,
     },
   ];
 

@@ -17,6 +17,7 @@
   --color-muted: #F2F6F5;
 
   /* Derived Brand Tints & States (No new hues) */
+  --color-teal: #165B66;          /* alias for teal-mid, used as "medium teal" */
   --color-teal-hover: #08333A;
   --color-teal-pressed: #06252A;
   --color-teal-subtle: #E5F0F1;
@@ -25,6 +26,8 @@
   --color-orange-hover: #E64525;
   --color-orange-pressed: #CC391B;
   --color-orange-subtle: #FFF2EF;
+  --color-neon-orange-hover: #E64525;     /* alias for neon-orange hover */
+  --color-neon-orange-pressed: #CC391B;   /* alias for neon-orange pressed */
 
   --color-green-hover: #1C6B4A;
   --color-green-subtle: #EAF5F0;
@@ -86,16 +89,18 @@
 /* Phone-only token scaling (< 768px). Desktop and tablets (>= 768px) strictly untouched. */
 @media (max-width: 767.98px) {
   :root {
-    --text-display: clamp(20px, 5vw, 24px);
-    --text-h1: clamp(18px, 4vw, 21px);
-    --text-h2: 17px;
-    --text-h3: 15px;
-    --text-body: 13px;
-    --space-6: 16px;
-    --space-8: 22px;
-    --space-10: 28px;
-    --space-12: 34px;
-    --space-16: 44px;
-    --space-20: 56px;
+    --text-display: clamp(18px, 4.5vw, 22px);
+    --text-h1: clamp(16px, 3.8vw, 19px);
+    --text-h2: 15px;
+    --text-h3: 13.5px;
+    --text-body: 12px;
+    --space-4: 12px;
+    --space-5: 14px;
+    --space-6: 14px;
+    --space-8: 18px;
+    --space-10: 22px;
+    --space-12: 26px;
+    --space-16: 34px;
+    --space-20: 44px;
   }
 }

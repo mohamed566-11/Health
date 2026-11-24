@@ -11,9 +11,6 @@ import {
   Play,
   UserCheck,
   UserPlus,
-  Users,
-  UserX,
-  XCircle,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../contexts/AppContext';
@@ -21,7 +18,6 @@ import { Appointment, AppointmentStatus } from '../../types';
 import {
   Button,
   Card,
-  InlineAlert,
   StatusBadge,
 } from '../../components/common/UIPrimitives';
 import {
@@ -32,7 +28,7 @@ import {
   TextInput,
 } from '../../components/forms/FormControls';
 import { KpiCard } from '../../components/common/DashboardCharts';
-import { ConfirmDialog, Modal } from '../../components/modals/Overlays';
+import { Modal } from '../../components/modals/Overlays';
 import {
   formatDateArabic,
   formatNumber,
@@ -617,7 +613,7 @@ export const NurseQueuePage: React.FC = () => {
                     type: 'you_are_next',
                     title: 'اقترب دورك للدخول',
                     message: `رقم حجزك ${nextEligible.bookingNumber}: يرجى التوجه إلى غرفة الكشف الآن.`,
-                    linkTo: `/patient/queue/${nextEligible.id}`,
+                    linkTo: `/patient/track/${nextEligible.id}`,
                   });
                   showToast(`تم إرسال تنبيه اقتراب الدور للمريض: ${nextEligible.patientName}`, 'success');
                 }

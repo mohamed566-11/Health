@@ -180,6 +180,12 @@ export const StatusBadge: React.FC<{
         'bg-[var(--color-muted)] text-[var(--color-primary-text)] border-[var(--color-border)]',
       icon: <UserX className="w-4 h-4 shrink-0" strokeWidth={1.75} aria-hidden="true" />,
     },
+    late: {
+      label: 'متأخر',
+      classes:
+        'bg-[var(--color-orange-subtle)] text-[var(--color-neon-orange)] border-[var(--color-neon-orange)]/40',
+      icon: <Clock className="w-4 h-4 shrink-0 text-[var(--color-neon-orange)]" strokeWidth={2} aria-hidden="true" />,
+    },
     cancelled: {
       label: 'ملغي',
       classes:

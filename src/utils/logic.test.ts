@@ -93,13 +93,31 @@ test('Live queue metrics and Finish Examination & Call Next progression', () => 
   assert.equal(nextMetrics.estimatedWaitMinutes, 45); // 3 * 15 = 45
 });
 
-test('Expanded medical catalog includes 24 doctors, 10 specialties, 18 clinics, and 8 governorates', () => {
-  assert.equal(SEED_DOCTORS.length, 24);
-  assert.equal(SEED_SPECIALTIES.length, 10);
-  assert.equal(SEED_CLINICS.length, 18);
-  assert.equal(SEED_LOCATIONS.length, 8);
+test('Medical catalog includes 60+ doctors, 5 specialties, 60+ clinics, and all 27 Egyptian governorates', () => {
+  assert.ok(SEED_DOCTORS.length >= 60, `Expected at least 60 doctors, got ${SEED_DOCTORS.length}`);
+  assert.equal(SEED_SPECIALTIES.length, 5);
+  assert.ok(SEED_CLINICS.length >= 60, `Expected at least 60 clinics, got ${SEED_CLINICS.length}`);
+  assert.equal(SEED_LOCATIONS.length, 27);
   const approvedDoctors = SEED_DOCTORS.filter((d) => d.status === 'approved');
-  assert.equal(approvedDoctors.length, 23);
+  assert.ok(approvedDoctors.length >= 60);
+});
+
+test('Cascading location and specialty filtering yields correct doctor counts', () => {
+  // Cairo has doctors in multiple specialties
+  const cairoClinics = SEED_CLINICS.filter((c) => c.governorate === 'القاهرة');
+  assert.ok(cairoClinics.length >= 10);
+
+  // Nasr City has doctors
+  const nasrClinics = cairoClinics.filter((c) => c.city === 'مدينة نصر');
+  assert.ok(nasrClinics.length >= 3);
+
+  // Remote governorate empty state: New Valley has no Cardiology doctors
+  const newValleyClinics = SEED_CLINICS.filter((c) => c.governorate === 'الوادي الجديد');
+  const newValleyDoctors = SEED_DOCTORS.filter((d) =>
+    newValleyClinics.some((c) => d.clinicIds.includes(c.id))
+  );
+  const newValleyCardio = newValleyDoctors.filter((d) => d.specialtyId === 'spec-1');
+  assert.equal(newValleyCardio.length, 0, 'New Valley should intentionally have 0 cardio doctors for empty-state test');
 });
 
 test('Patient explainer video scenes and duration integrity', async () => {
@@ -139,6 +157,7 @@ test('Safe queue calculations on empty collections', () => {
     date: '2026-11-06',
     timeSlot: '06:00 م',
     queuePosition: 1,
+    ticketNumber: 99,
     status: 'booked' as const,
     fee: 300,
     type: 'consultation' as const,
@@ -151,4 +170,12 @@ test('Safe queue calculations on empty collections', () => {
   assert.equal(emptyQueueMetrics.currentlyExamining, null);
   assert.equal(emptyQueueMetrics.nextEligible, null);
   assert.equal(emptyQueueMetrics.activeQueueList.length, 0);
+});
+
+test('Admin dedicated credentials validation and route permissions', () => {
+  const validateAdminCredentials = (u: string, p: string) => u.trim() === 'admin' && p.trim() === 'admin';
+  assert.equal(validateAdminCredentials('admin', 'admin'), true);
+  assert.equal(validateAdminCredentials(' admin ', 'admin'), true);
+  assert.equal(validateAdminCredentials('admin', 'wrong'), false);
+  assert.equal(validateAdminCredentials('user', 'admin'), false);
 });

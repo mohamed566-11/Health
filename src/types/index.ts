@@ -7,7 +7,8 @@ export type AppointmentStatus =
   | 'in_examination'
   | 'completed'
   | 'no_show'
-  | 'cancelled';
+  | 'cancelled'
+  | 'late';
 
 export interface UserSession {
   id: string;
@@ -82,6 +83,14 @@ export interface Doctor {
   phone: string;
   nextAvailableText: string;
   doctorStatus: 'available' | 'in_examination' | 'delayed' | 'off_duty';
+  queueOffset: number; // default 4
+  avgExamMinutes: number; // default 10
+  lateAction: 'fine' | 'cancel'; // default 'fine'
+  defaultLateFine: number; // default 50
+  defaultNoShowFine: number; // default 100
+  followUpDays: number; // default 14
+  followUpFee: number; // default 0
+  maxPatientsPerDay?: number; // default 30
 }
 
 export interface Patient {
@@ -117,6 +126,7 @@ export interface Nurse {
 export interface Appointment {
   id: string;
   bookingNumber: string; // e.g. "#025"
+  ticketNumber: number; // sequential starting at 1 per doctor per date
   patientId: string;
   patientName: string;
   patientPhone: string;
@@ -137,9 +147,46 @@ export interface Appointment {
   statusChangeReason?: string;
   diagnosis?: string;
   prescriptionId?: string;
+  notifyAt?: 3 | 4;
+  isFollowUp?: boolean;
+  pricePaid?: boolean;
+  finesTotal?: number;
+  totalPrice?: number;
+  arrivedAt?: string;
+  enteredAt?: string;
+  completedAt?: string;
   createdAt: string;
   updatedAt: string;
   examinationStartedAt?: string;
+}
+
+export interface Fine {
+  id: string;
+  patientPhone: string;
+  appointmentId?: string;
+  doctorId: string;
+  type: 'late' | 'no_show';
+  amount: number;
+  status: 'unpaid' | 'paid';
+  note?: string;
+  createdAt: string;
+  paidAt?: string;
+}
+
+export interface PatientFlowState {
+  governorateId?: string;
+  governorateName?: string;
+  centerId?: string;
+  centerName?: string;
+  specialtyId?: string;
+  specialtyName?: string;
+  doctorId?: string;
+}
+
+export interface PatientSession {
+  name: string;
+  phone: string;
+  lastAppointmentId?: string;
 }
 
 export interface MedicineCatalogItem {

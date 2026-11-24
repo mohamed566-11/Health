@@ -3,18 +3,15 @@ import {
   Building2,
   Calendar,
   Check,
-  MapPin,
   MessageSquare,
   Plus,
   RotateCcw,
-  Shield,
   Stethoscope,
   Users,
-  X,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../contexts/AppContext';
-import { Doctor, Nurse, Specialty } from '../../types';
+import { Doctor, Specialty } from '../../types';
 import {
   Button,
   Card,

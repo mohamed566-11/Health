@@ -1,18 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Activity,
   AlertTriangle,
-  Building2,
   Calendar,
   Check,
   Clock,
   Edit3,
-  FileText,
   Lock,
   Pin,
   Plus,
   Search,
-  Star,
   Stethoscope,
   Trash2,
   UserCheck,
@@ -49,7 +45,6 @@ import {
 import { KpiCard, SegmentedStatusBar } from '../../components/common/DashboardCharts';
 import { ClinicLocationCard } from '../../components/cards/ClinicLocationCard';
 import {
-  formatCurrencyEGP,
   formatDateArabic,
   formatNumber,
   formatShortDateArabic,
@@ -1028,7 +1023,6 @@ export const PrescriptionBuilderPage: React.FC = () => {
     templates,
     savePrescription,
     savePrescriptionTemplate,
-    toggleFavoriteMedicine,
   } = useApp();
   const navigate = useNavigate();
 

@@ -107,7 +107,7 @@ function runChrome(url, width, height, targetFile) {
 
 const routes = [
   // Public
-  { name: 'login', path: '/login', role: null },
+  { name: 'administration', path: '/administration', role: null },
   { name: 'register', path: '/register', role: null },
   { name: 'onboarding', path: '/onboarding', role: null },
   { name: 'dev_ui', path: '/dev/ui', role: null },

@@ -6,9 +6,9 @@ import {
   Clinic,
   Doctor,
   DoctorPrivateNote,
+  Fine,
   GovernorateLocation,
   MedicalRecordItem,
-  MedicineCatalogItem,
   Nurse,
   Patient,
   Prescription,
@@ -25,12 +25,18 @@ import {
   loadFullSnapshot,
   savePrivateNoteForDoctor,
   seedAllDemoData,
+  setPatientSession,
   SnapshotState,
   STORAGE_KEYS,
   writeStorage,
 } from '../services/storageService';
 import { getSavedSession, loginAsDemoRole, logoutSession } from '../services/mockAuth';
-import { advanceClinicQueue, recalculateClinicQueuePositions } from '../services/queueService';
+import {
+  advanceClinicQueue,
+  checkFollowUpEligibility,
+  getNextTicketNumber,
+  recalculateClinicQueuePositions,
+} from '../services/queueService';
 import { TODAY_DATE } from '../data/appointments';
 
 export interface ToastItem {
@@ -90,6 +96,25 @@ interface AppContextValue extends SnapshotState {
     type: 'consultation' | 'follow_up';
     symptomsOrReason?: string;
   }) => Appointment;
+  bookPatientDirect: (input: {
+    name: string;
+    phone: string;
+    doctorId: string;
+    date: string;
+  }) => Appointment;
+  checkInPatientArrived: (appointmentId: string) => void;
+  checkInPatientExam: (appointmentId: string) => void;
+  applyFine: (input: {
+    patientPhone: string;
+    appointmentId?: string;
+    doctorId: string;
+    type: 'late' | 'no_show';
+    amount: number;
+    note?: string;
+  }) => Fine;
+  collectPayment: (appointmentId: string, fineIds?: string[]) => void;
+  updateDoctorSettings: (doctorId: string, settings: Partial<Doctor>) => void;
+  updateAppointmentNotifyAt: (appointmentId: string, notifyAt: 3 | 4) => void;
   cancelAppointment: (appointmentId: string, reason?: string) => void;
   postponeAppointment: (appointmentId: string, newDate: string, newTimeSlot: string, reason?: string) => void;
   startExamination: (appointmentId: string) => void;
@@ -341,6 +366,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         phone: input.phone.trim(),
         nextAvailableText: 'اليوم 06:00 م',
         doctorStatus: 'available',
+        queueOffset: 4,
+        avgExamMinutes: 10,
+        lateAction: 'fine',
+        defaultLateFine: 50,
+        defaultNoShowFine: 100,
+        followUpDays: 14,
+        followUpFee: input.followUpPrice || 0,
+        maxPatientsPerDay: 30,
       };
 
       const nextClinics = [newClinic, ...snapshot.clinics];
@@ -444,9 +477,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const bookingNumber = `#0${numericBooking}`;
       const nowIso = new Date().toISOString();
 
+      const ticketNum = getNextTicketNumber(snapshot.appointments, doctor.id, input.date);
       const created: Appointment = {
         id: `apt-${Date.now()}`,
         bookingNumber,
+        ticketNumber: ticketNum,
         patientId: patient.id,
         patientName: patient.name,
         patientPhone: patient.phone,
@@ -475,7 +510,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         type: 'booking_confirmed',
         title: 'تم تأكيد حجزك بنجاح',
         message: `تم تأكيد حجزك رقم ${created.bookingNumber} لدى ${doctor.name} في ${clinic.name} بتاريخ ${input.date} (${input.timeSlot}).`,
-        linkTo: `/patient/queue/${created.id}`,
+        linkTo: `/patient/track/${created.id}`,
       });
 
       return created;
@@ -536,7 +571,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         type: 'appointment_postponed',
         title: 'تم تعديل موعد حجزك',
         message: `تم نقل حجزك ${target.bookingNumber} إلى تاريخ ${newDate} الساعة ${newTimeSlot}.`,
-        linkTo: `/patient/appointments/${target.id}`,
+        linkTo: `/patient/track/${target.id}`,
       });
       showToast(`تم تأجيل الحجز ${target.bookingNumber} بنجاح`, 'success');
     },
@@ -615,7 +650,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             type: 'you_are_next',
             title: 'دورك هو القادم مباشرة!',
             message: `رقم حجزك ${apt.bookingNumber}: أنت المريض التالي للدخول إلى غرفة الكشف.`,
-            linkTo: `/patient/queue/${apt.id}`,
+            linkTo: `/patient/track/${apt.id}`,
           });
         } else if (ahead === 2) {
           sendSimulatedNotification({
@@ -623,7 +658,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             type: 'two_ahead',
             title: 'اقترب دورك — أمامك مريضان',
             message: `رقم حجزك ${apt.bookingNumber}: يرجى التواجد في استراحة العيادة الآن.`,
-            linkTo: `/patient/queue/${apt.id}`,
+            linkTo: `/patient/track/${apt.id}`,
           });
         }
       });
@@ -782,9 +817,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         ? input.queuePosition
         : clinicActive.length + 1;
 
+      const walkInTicket = getNextTicketNumber(snapshot.appointments, doctor.id, TODAY_DATE);
       const created: Appointment = {
         id: `apt-${Date.now()}`,
         bookingNumber: `#W${snapshot.appointments.length + 10}`,
+        ticketNumber: walkInTicket,
         patientId: patient.id,
         patientName: input.patientName.trim(),
         patientPhone: input.patientPhone.trim(),
@@ -846,7 +883,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           type: 'doctor_delayed',
           title: 'تنبيه بتأخر موعد العيادة',
           message: `نعتذر عن تأخر المواعيد في ${clinic?.name ?? 'العيادة'} بمقدار ${delayMinutes} دقيقة تقريبًا.`,
-          linkTo: `/patient/queue/${apt.id}`,
+          linkTo: `/patient/track/${apt.id}`,
         });
       });
 
@@ -1154,6 +1191,318 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     [showToast, snapshot.reviews]
   );
 
+  const bookPatientDirect = useCallback(
+    (input: {
+      name: string;
+      phone: string;
+      doctorId: string;
+      date: string;
+    }): Appointment => {
+      const cleanPhone = input.phone.trim();
+      const cleanName = input.name.trim();
+      const doctor = snapshot.doctors.find((d) => d.id === input.doctorId) ?? snapshot.doctors[0];
+      const clinic = snapshot.clinics.find((c) => doctor.clinicIds.includes(c.id)) ?? snapshot.clinics[0];
+
+      // Double booking prevention: same phone + same doctor + same day
+      const existingSameDay = snapshot.appointments.find(
+        (a) =>
+          a.doctorId === doctor.id &&
+          a.date === input.date &&
+          a.patientPhone?.trim() === cleanPhone &&
+          a.status !== 'cancelled' &&
+          a.status !== 'no_show'
+      );
+      if (existingSameDay) {
+        setPatientSession({
+          name: cleanName || existingSameDay.patientName,
+          phone: cleanPhone,
+          lastAppointmentId: existingSameDay.id,
+        });
+        showToast(`لديك حجز مؤكد بالفعل عند هذا الطبيب في نفس اليوم (تذكرة رقم ${existingSameDay.ticketNumber})`, 'info');
+        return existingSameDay;
+      }
+
+      // Capacity check: maxPatientsPerDay
+      const currentDoctorBookedCount = snapshot.appointments.filter(
+        (a) => a.doctorId === doctor.id && a.date === input.date && a.status !== 'cancelled'
+      ).length;
+      const maxCapacity = doctor.maxPatientsPerDay ?? 30;
+      if (currentDoctorBookedCount >= maxCapacity) {
+        showToast('عذرًا، اكتمل العدد الأقصى للحجوزات عند هذا الطبيب لهذا اليوم', 'error');
+        throw new Error('CAPACITY_REACHED');
+      }
+
+      let patient = snapshot.patients.find((p) => p.phone.trim() === cleanPhone);
+      let updatedPatients = snapshot.patients;
+      if (!patient) {
+        patient = {
+          id: `pat-${Date.now()}`,
+          name: cleanName,
+          phone: cleanPhone,
+          birthDate: '1990-01-01',
+          gender: 'male',
+          governorate: clinic.governorate,
+          city: clinic.city,
+          allergies: [],
+          chronicConditions: [],
+          onboardingCompleted: true,
+          notificationPrefs: {
+            queueAlerts: true,
+            appointmentReminders: true,
+            prescriptionReady: true,
+          },
+          createdAt: new Date().toISOString(),
+        };
+        updatedPatients = [patient, ...snapshot.patients];
+        writeStorage(STORAGE_KEYS.patients, updatedPatients);
+      }
+
+      const followUpCheck = checkFollowUpEligibility(
+        snapshot.appointments,
+        cleanPhone,
+        doctor.id,
+        input.date,
+        doctor.followUpDays ?? 14
+      );
+
+      const unpaidFines = (snapshot.fines || []).filter(
+        (f) => f.patientPhone.trim() === cleanPhone && f.status === 'unpaid'
+      );
+      const finesTotal = unpaidFines.reduce((sum, f) => sum + f.amount, 0);
+      const fee = followUpCheck.isFollowUp ? (doctor.followUpFee ?? 0) : doctor.consultationFee;
+      const totalPrice = fee + finesTotal;
+
+      const ticketNumber = getNextTicketNumber(snapshot.appointments, doctor.id, input.date);
+      const bookingNumber = `#${ticketNumber < 10 ? '0' : ''}${ticketNumber}`;
+      const nowIso = new Date().toISOString();
+
+      const created: Appointment = {
+        id: `apt-${Date.now()}`,
+        bookingNumber,
+        ticketNumber,
+        patientId: patient.id,
+        patientName: cleanName || patient.name,
+        patientPhone: cleanPhone,
+        doctorId: doctor.id,
+        doctorName: doctor.name,
+        specialtyAr: doctor.specialtyAr,
+        clinicId: clinic.id,
+        clinicName: clinic.name,
+        date: input.date,
+        timeSlot: '06:00 م',
+        queuePosition: ticketNumber,
+        status: 'booked',
+        fee,
+        type: followUpCheck.isFollowUp ? 'follow_up' : 'consultation',
+        isFollowUp: followUpCheck.isFollowUp,
+        finesTotal,
+        totalPrice,
+        pricePaid: false,
+        symptomsOrReason: followUpCheck.isFollowUp ? 'كشف إعادة واستشارة' : 'كشف طبي جديد',
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      };
+
+      const nextAppointments = [created, ...snapshot.appointments];
+      writeStorage(STORAGE_KEYS.appointments, nextAppointments);
+
+      setPatientSession({
+        name: cleanName,
+        phone: cleanPhone,
+        lastAppointmentId: created.id,
+      });
+
+      setSnapshot((prev) => ({
+        ...prev,
+        patients: updatedPatients,
+        appointments: nextAppointments,
+      }));
+
+      showToast(`تم حجز موعدك بنجاح! رقم تذكرتك هو ${bookingNumber}`, 'success');
+      return created;
+    },
+    [snapshot.appointments, snapshot.doctors, snapshot.clinics, snapshot.patients, snapshot.fines, showToast]
+  );
+
+  const checkInPatientArrived = useCallback(
+    (appointmentId: string) => {
+      const nowIso = new Date().toISOString();
+      const updated = snapshot.appointments.map((a) =>
+        a.id === appointmentId
+          ? { ...a, status: 'arrived' as const, arrivedAt: nowIso, updatedAt: nowIso }
+          : a
+      );
+      writeStorage(STORAGE_KEYS.appointments, updated);
+      setSnapshot((prev) => ({ ...prev, appointments: updated }));
+      showToast('تم تسجيل وصول المريض إلى العيادة بنجاح', 'success');
+    },
+    [snapshot.appointments, showToast]
+  );
+
+  const checkInPatientExam = useCallback(
+    (appointmentId: string) => {
+      const nowIso = new Date().toISOString();
+      const target = snapshot.appointments.find((a) => a.id === appointmentId);
+      if (!target) return;
+      const updated = snapshot.appointments.map((a) => {
+        if (a.id === appointmentId) {
+          return {
+            ...a,
+            status: 'in_examination' as const,
+            enteredAt: nowIso,
+            examinationStartedAt: nowIso,
+            updatedAt: nowIso,
+          };
+        }
+        if (a.doctorId === target.doctorId && a.date === target.date && a.status === 'in_examination') {
+          return {
+            ...a,
+            status: 'completed' as const,
+            completedAt: nowIso,
+            updatedAt: nowIso,
+          };
+        }
+        return a;
+      });
+      writeStorage(STORAGE_KEYS.appointments, updated);
+      setSnapshot((prev) => ({ ...prev, appointments: updated }));
+      showToast(`المريض ${target.patientName} (${target.bookingNumber}) داخل غرفة الكشف الآن`, 'info');
+    },
+    [snapshot.appointments, showToast]
+  );
+
+  const applyFine = useCallback(
+    (input: {
+      patientPhone: string;
+      appointmentId?: string;
+      doctorId: string;
+      type: 'late' | 'no_show';
+      amount: number;
+      note?: string;
+    }): Fine => {
+      const doctor = snapshot.doctors.find((d) => d.id === input.doctorId) ?? snapshot.doctors[0];
+      const newFine: Fine = {
+        id: `fine-${Date.now()}`,
+        patientPhone: input.patientPhone.trim(),
+        appointmentId: input.appointmentId,
+        doctorId: input.doctorId,
+        type: input.type,
+        amount: input.amount,
+        status: 'unpaid',
+        note: input.note?.trim(),
+        createdAt: new Date().toISOString(),
+      };
+      const nextFines = [newFine, ...(snapshot.fines || [])];
+      writeStorage(STORAGE_KEYS.fines, nextFines);
+
+      let nextAppointments = snapshot.appointments;
+      if (input.appointmentId) {
+        nextAppointments = snapshot.appointments.map((a) => {
+          if (a.id !== input.appointmentId) return a;
+          const newFinesTotal = (a.finesTotal || 0) + input.amount;
+          const newTotalPrice = (a.totalPrice || a.fee) + input.amount;
+          if (input.type === 'late') {
+            if (doctor.lateAction === 'cancel') {
+              return {
+                ...a,
+                status: 'cancelled' as const,
+                statusChangeReason: 'إلغاء الموعد بسبب التأخير وفق لائحة الطبيب',
+                finesTotal: newFinesTotal,
+                totalPrice: newTotalPrice,
+                updatedAt: new Date().toISOString(),
+              };
+            }
+            return {
+              ...a,
+              status: 'late' as const,
+              finesTotal: newFinesTotal,
+              totalPrice: newTotalPrice,
+              updatedAt: new Date().toISOString(),
+            };
+          }
+          return {
+            ...a,
+            status: 'no_show' as const,
+            finesTotal: newFinesTotal,
+            totalPrice: newTotalPrice,
+            updatedAt: new Date().toISOString(),
+          };
+        });
+        writeStorage(STORAGE_KEYS.appointments, nextAppointments);
+      }
+
+      setSnapshot((prev) => ({
+        ...prev,
+        fines: nextFines,
+        appointments: nextAppointments,
+      }));
+
+      showToast(
+        input.type === 'late'
+          ? `تم تطبيق غرامة تأخير بقيمة ${input.amount} ج.م`
+          : `تم تسجيل غرامة عدم حضور بقيمة ${input.amount} ج.م`,
+        'warning'
+      );
+      return newFine;
+    },
+    [snapshot.doctors, snapshot.fines, snapshot.appointments, showToast]
+  );
+
+  const collectPayment = useCallback(
+    (appointmentId: string, fineIds?: string[]) => {
+      const nowIso = new Date().toISOString();
+      const target = snapshot.appointments.find((a) => a.id === appointmentId);
+      const cleanPhone = target ? target.patientPhone.trim() : '';
+
+      const updatedFines = (snapshot.fines || []).map((f) => {
+        if (fineIds && fineIds.includes(f.id)) {
+          return { ...f, status: 'paid' as const, paidAt: nowIso };
+        }
+        if (!fineIds && cleanPhone && f.patientPhone.trim() === cleanPhone && f.status === 'unpaid') {
+          return { ...f, status: 'paid' as const, paidAt: nowIso };
+        }
+        return f;
+      });
+      writeStorage(STORAGE_KEYS.fines, updatedFines);
+
+      const updatedAppointments = snapshot.appointments.map((a) =>
+        a.id === appointmentId ? { ...a, pricePaid: true, updatedAt: nowIso } : a
+      );
+      writeStorage(STORAGE_KEYS.appointments, updatedAppointments);
+
+      setSnapshot((prev) => ({
+        ...prev,
+        fines: updatedFines,
+        appointments: updatedAppointments,
+      }));
+      showToast('تم تحصيل الرسوم والغرامات بنجاح', 'success');
+    },
+    [snapshot.appointments, snapshot.fines, showToast]
+  );
+
+  const updateDoctorSettings = useCallback(
+    (doctorId: string, settings: Partial<Doctor>) => {
+      const updatedDoctors = snapshot.doctors.map((d) =>
+        d.id === doctorId ? { ...d, ...settings } : d
+      );
+      writeStorage(STORAGE_KEYS.doctors, updatedDoctors);
+      setSnapshot((prev) => ({ ...prev, doctors: updatedDoctors }));
+      showToast('تم حفظ إعدادات الطبيب بنجاح', 'success');
+    },
+    [snapshot.doctors, showToast]
+  );
+
+  const updateAppointmentNotifyAt = useCallback(
+    (appointmentId: string, notifyAt: 3 | 4) => {
+      const updated = snapshot.appointments.map((a) =>
+        a.id === appointmentId ? { ...a, notifyAt, updatedAt: new Date().toISOString() } : a
+      );
+      writeStorage(STORAGE_KEYS.appointments, updated);
+      setSnapshot((prev) => ({ ...prev, appointments: updated }));
+    },
+    [snapshot.appointments]
+  );
+
   const resetAllDemoData = useCallback(() => {
     seedAllDemoData(false);
     setSnapshot(loadFullSnapshot());
@@ -1180,6 +1529,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       completeOnboarding,
       restartOnboarding,
       bookAppointment,
+      bookPatientDirect,
+      checkInPatientArrived,
+      checkInPatientExam,
+      applyFine,
+      collectPayment,
+      updateDoctorSettings,
+      updateAppointmentNotifyAt,
       cancelAppointment,
       postponeAppointment,
       startExamination,
@@ -1216,6 +1572,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addWalkInAppointment,
       announceClinicDelay,
       bookAppointment,
+      bookPatientDirect,
+      checkInPatientArrived,
+      checkInPatientExam,
+      applyFine,
+      collectPayment,
+      updateDoctorSettings,
+      updateAppointmentNotifyAt,
       cancelAppointment,
       completeOnboarding,
       debugGrid,
